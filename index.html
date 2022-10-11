@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My First Web Page</title>
+        <style>
+            /* import custom fonts */
+            @font-face {font-family: Minecraft; src: url('Minecraft.ttf');}
+            @font-face {font-family: Compact; src: url('compact.ttf');}
+            
+            /* general elements */
+            body{
+                background-color: #8FCB5D;
+                color: #000;
+                font-family: monospace;
+            }
+            textarea{
+                font-family: monospace;
+            }
+            button{
+                font-family: monospace;
+            }
+
+            
+
+            /* ids */
+            #container{
+                width: 800px;
+                margin: 40px auto;
+                /* border:1px solid #477A1E; */
+                /* display:block; */
+            }
+            #header{
+                text-align:center;
+                padding-top:10px;
+                font-size:36px;
+                border:1px solid #cdcdcd;
+                border-radius:5px;
+                font-family: 'Minecraft';
+                background-color: #dedede;
+            }
+
+            /* render section */
+            #render{
+                width:460px;
+                text-align:center;
+                font-size:36px;
+                /* border:1px solid white; */
+                display:inline-block;
+                vertical-align: top;
+            }
+            #renderCanvas{
+                margin:35px 15px 5px 15px;
+                background-color: #efefef;
+                border:1px solid black;
+                border-radius:3px;
+                width:400px;
+                height:300px;
+            }
+
+            #dataView{
+                width:330px;
+                text-align: center;
+                /* border:1px solid blue; */
+                vertical-align: top;
+                display:inline-block;
+            }
+            
+            /* data import section */
+            #arr3din{
+                margin-top:20px;
+                border:1px solid black;
+            }
+            #texturekey{
+                margin:20px 10px 40px 15px;
+                border:1px solid black;
+                border-radius: 2px;
+                width:300px;
+                height:220px;
+                background-color: #ffffff;
+            }
+
+            #menu{
+                width:460px;
+                /* border:1px solid yellow; */
+                text-align: center;
+            }
+            #menu > button{
+                margin:5px 10px 15px 10px;
+                padding:5px;
+                font-size:12px;
+                width:100px;
+            }
+
+
+            /* classes */
+            .row{
+                display:table-row;
+            }
+            .slideDiv{
+                width:420px;
+                text-align:right;
+                font-weight: bold;
+                padding-bottom:10px;
+                /* border:1px solid blue; */
+                margin:auto;
+            }
+            .slideDiv > .slider{
+                width: 300px;
+                vertical-align: middle;
+            }
+
+            .slidVal{
+                width: 50px;
+                text-align: center;
+                vertical-align: middle;
+                display:inline-block;
+            }
+
+
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                VoxWorld JS
+            </div>
+           
+            <!-- render the structure here -->
+            <div style="display:inline-block">
+                <div id="render">
+                    <canvas id="renderCanvas"></canvas>
+                </div>
+                 <!-- option buttons / menu here -->
+                <div id="menu">
+                    <!-- buttons -->
+                    <button id="expPNGBtn">Export PNG</button>
+                    <button id="renderBtn">RENDER</button>
+                    <button id="expGIFBtn">Export GIF</button>
+                
+                    <!-- zoom + angle sliders -->
+                    <div class="slideDiv">
+                        Angle: 
+                        <input type="range" min="1" max="360" value="180" class="slider" id="angleView">
+                        <span class='slidVal' id="angleViewVal">180</span>
+                    </div>
+                    <div class="slideDiv">
+                        Zoom: 
+                        <input type="range" min="1" max="20" value="10" class="slider" id="zoomView">
+                        <span class='slidVal' id="zoomViewVal">10</span>
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- import the data here -->
+            <div id="dataView">
+                <textarea id="arr3din" rows="10" cols="35" placeholder="[[[Paste 3d Array Here]]]"></textarea>
+                <div id="texturekey">
+
+                </div>
+            </div>
+
+           
+            
+            
+        </div>
+        <script src="code.js"></script>
+    </body>
+</html>
