@@ -36,7 +36,7 @@
                 border:1px solid #cdcdcd;
                 border-radius:5px;
                 font-family: 'Minecraft';
-                background-color: #dedede;
+                background-color: #f7f7f7;
             }
 
             /* render section */
@@ -73,12 +73,20 @@
             #texturekey{
                 margin:20px 10px 40px 15px;
                 border:1px solid black;
-                border-radius: 2px;
+                border-radius: 4px;
                 width:300px;
                 height:220px;
                 background-color: #ffffff;
+                overflow-y:scroll;
+            }
+            #air_block{
+                width:26px;
+                height:26px;
+                margin:5px auto 5px auto;
+                border:2px dashed #000;
             }
 
+            /* render options + menu */
             #menu{
                 width:460px;
                 /* border:1px solid yellow; */
@@ -93,9 +101,53 @@
 
 
             /* classes */
-            .row{
-                display:table-row;
+
+            /* textures */
+            .tex_row{
+                display:table;
+                width:100%;
+                border-bottom:2px solid #e0e0e0;
+                background-color: #fff;
             }
+            .tex_row:hover{
+                background-color: #f0f0f0;
+            }
+            .tex_row > div{
+                height:100%;
+                /* border:1px solid black; */
+                text-align:center;
+                /* font-size:22px; */
+                display:table-cell;
+                padding:5px;
+                vertical-align: middle;
+            }
+            .tex_id{
+                width:20%;
+                font-size:16px;
+            }
+            .tex_name{
+                width:60%;
+                font-size:18px;
+            }
+            .tex_select{
+                width:150px;
+                font-family: monospace;
+                text-align: center;
+                font-size:16px;
+                border:none;
+                background-color: transparent;
+            }
+            .tex_img{
+                width:20%;
+            }
+            .tex_img > img{
+                width:30px;
+                margin-top:5px;
+            }
+            
+
+
+            /* sliders  */
             .slideDiv{
                 width:420px;
                 text-align:right;
@@ -115,6 +167,7 @@
                 vertical-align: middle;
                 display:inline-block;
             }
+            
 
 
         </style>
@@ -156,7 +209,38 @@
             <div id="dataView">
                 <textarea id="arr3din" rows="10" cols="35" placeholder="[[[Paste 3d Array Here]]]"></textarea>
                 <div id="texturekey">
-
+                    <div class="tex_row locked">
+                        <div class="tex_id">0</div>
+                        <div class="tex_name">Air</div>
+                        <div class="tex_img"><div id="air_block"></div></div>
+                    </div>
+                    <div class="tex_row">
+                        <div class="tex_id">1</div>
+                        <div class="tex_name">
+                            <select class="tex_select">
+                                <option value="cobblestone">Cobblestone</option>
+                                <option value="dirt">Dirt</option>
+                                <option value="oak_wood_planks">Oak Wood Planks</option>
+                                <option value="diamond_block">Diamond Block</option>
+                            </select>
+                        </div>
+                        <div class="tex_img"><img src="textures/pngs/cobblestone.png"></div>
+                    </div>
+                    <div class="tex_row">
+                        <div class="tex_id">2</div>
+                        <div class="tex_name"><select class="tex_select"><option>???</option></select></div>
+                        <div class="tex_img"><img src="textures/pngs/dirt.png"></div>
+                    </div>
+                    <div class="tex_row">
+                        <div class="tex_id">3</div>
+                        <div class="tex_name"><select class="tex_select"><option>???</option></select></div>
+                        <div class="tex_img"><img src="textures/pngs/oak_planks.png"></div>
+                    </div>
+                    <div class="tex_row">
+                        <div class="tex_id">100</div>
+                        <div class="tex_name"><select class="tex_select"><option>???</option></select></div>
+                        <div class="tex_img"><img src="textures/pngs/diamond_block.png"></div>
+                    </div>
                 </div>
             </div>
 
