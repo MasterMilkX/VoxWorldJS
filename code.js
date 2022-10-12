@@ -22,12 +22,12 @@ function importTextures(){
     .then((json) =>  {
         ALL_TEXTURES = json.textures;
         console.log(ALL_TEXTURES.length);
-        makeTextures();
+        makeTextures(CUR_TEXTURE_LIST.length);
     });
 }
 
 //make dropdowns of the textures
-function makeTextures(numTexture=10){
+function makeTextures(numTexture=10,scroll=false){
     var textureSet = document.getElementById("texturekey");
     textureSet.innerHTML = "";  //clear out previous texture rows if any
 
@@ -36,6 +36,10 @@ function makeTextures(numTexture=10){
         //make a new row
         let trow = makeTextureRow(i);
         textureSet.appendChild(trow);
+    }
+
+    if(scroll){
+        textureSet.scrollTop = textureSet.scrollHeight;
     }
 }
 
@@ -124,7 +128,9 @@ function changeSlidePos(id, value){
 //initial function for the app
 function init(){
     //set default selected texture
-    CUR_TEXTURE_LIST = (localStorage.tex_list ? JSON.parse(localStorage.tex_list) : ["air","stone","dirt","grass_side","planks_oak","sand","leaves_oak","glass","iron_block","log_oak","rail_normal","stone_slab_side"]);
+    CUR_TEXTURE_LIST = (localStorage.tex_list ? JSON.parse(localStorage.tex_list) : ["air","stone","dirt","planks_oak","sand","leaves_oak","glass","iron_block","log_oak","rail_normal","stone_slab_side"]);
+    document.getElementById("numTextures").value = CUR_TEXTURE_LIST.length;
 
+    //import the textures
     importTextures();
 }
