@@ -7,6 +7,7 @@
 
 
 //create a new dropdown texture item
+var TEXTURE_DIR = "def_textures/";
 var ALL_TEXTURES = [];
 var CUR_TEXTURE_LIST = [];  
 
@@ -28,6 +29,9 @@ function importTextures(){
 
 //make dropdowns of the textures
 function makeTextures(numTexture=10,scroll=false){
+    //keep the number of textures between 2 and 100
+    numTexture = Math.min(Math.max(numTexture,2),100);   //copilot is a gotdamn genius (and a telepath)
+
     var textureSet = document.getElementById("texturekey");
     textureSet.innerHTML = "";  //clear out previous texture rows if any
 
@@ -38,6 +42,7 @@ function makeTextures(numTexture=10,scroll=false){
         textureSet.appendChild(trow);
     }
 
+    //scroll to the bottom of the div to see the latest texture
     if(scroll){
         textureSet.scrollTop = textureSet.scrollHeight;
     }
@@ -89,9 +94,9 @@ function makeTextureRow(id_num){
 
     //set the src
     if(id_num < CUR_TEXTURE_LIST.length){
-        img.src = "textures/" + CUR_TEXTURE_LIST[id_num] + ".png";
+        img.src = TEXTURE_DIR + "/" + CUR_TEXTURE_LIST[id_num] + ".png";
     }else{
-        img.src = "textures/air.png";
+        img.src = TEXTURE_DIR + "/air.png";
     }
 
     imgCol.appendChild(img);
@@ -104,7 +109,7 @@ function makeTextureRow(id_num){
 function changeTexture(dd){
     var id = dd.id.split("_")[2];
     var img = document.getElementById("tex_img_"+id);
-    img.src = "textures/"+dd.value+".png";
+    img.src = TEXTURE_DIR+"/"+dd.value+".png";
     CUR_TEXTURE_LIST[id] = dd.value;
     localStorage.tex_list = JSON.stringify(CUR_TEXTURE_LIST);
 }   
