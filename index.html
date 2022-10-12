@@ -10,6 +10,8 @@
                QUICK STYLES CHECK 
                MOVE TO STYLES.CSS LATER
             */
+
+            
            
         </style>
     </head>
@@ -48,14 +50,19 @@
             
             <!-- import the data here -->
             <div id="dataView">
+                <!-- 3d structure -->
                 <textarea id="arr3din" rows="10" cols="35" placeholder="[[[Paste 3d Array Here]]]"></textarea>
-                
+                <div id="datSettings">
+                    <button id="impArr3D">Import Structure</button>
+                </div>
+
+
                 <!-- texture key for the render -->
                 <div id="texturekey">
                     <div class="tex_row locked">
                         <div class="tex_id">0</div>
                         <div class="tex_name"><select class="tex_select"><option>Air</option></select></div>
-                        <div class="tex_img"><img src="textures/pngs/air.png"></div>
+                        <div class="tex_img"><img src="textures/air.png"></div>
                     </div>
                     <div class="tex_row">
                         <div class="tex_id">1</div>
@@ -67,29 +74,29 @@
                                 <option value="diamond_block">Diamond Block</option>
                             </select>
                         </div>
-                        <div class="tex_img"><img src="textures/pngs/cobblestone.png"></div>
+                        <div class="tex_img"><img src="textures/cobblestone.png"></div>
                     </div>
                     <div class="tex_row">
                         <div class="tex_id">2</div>
                         <div class="tex_name"><select class="tex_select"><option>???</option></select></div>
-                        <div class="tex_img"><img src="textures/pngs/dirt.png"></div>
+                        <div class="tex_img"><img src="textures/dirt.png"></div>
                     </div>
                     <div class="tex_row">
                         <div class="tex_id">3</div>
                         <div class="tex_name"><select class="tex_select"><option>???</option></select></div>
-                        <div class="tex_img"><img src="textures/pngs/oak_wood_planks.png"></div>
+                        <div class="tex_img"><img src="textures/oak_wood_planks.png"></div>
                     </div>
                     <div class="tex_row">
                         <div class="tex_id">100</div>
                         <div class="tex_name"><select class="tex_select"><option>???</option></select></div>
-                        <div class="tex_img"><img src="textures/pngs/diamond_block.png"></div>
+                        <div class="tex_img"><img src="textures/diamond_block.png"></div>
                     </div>
                 </div>
 
                 <!-- allow import of dataset here -->
-                <div id="datImport">
-                    <button id="impArr3D">Import Structure</button>
-                    <button id="impTex">Import Textures</button>
+                <div id="texSettings">
+                    <input type="number" min="1" max="100" value="10" id="numTextures">
+                    <button id="impTex">Import Texture Preset</button>
                 </div>
             </div>
 

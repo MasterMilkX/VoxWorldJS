@@ -76,10 +76,18 @@ button{
 }
 
 /* data import buttons */
-#datImport{
-    margin:20px 0px 10px 0px;
+#datSettings{
+    margin:5px 0px 10px 0px;
 }
-#datImport button{
+#datSettings button{
+    margin:0px 5px 0px 5px;
+    padding:5px;
+}
+
+#texSettings{
+    margin:5px 0px 10px 0px;
+}
+#texSettings button{
     margin:0px 5px 0px 5px;
     padding:5px;
 }
