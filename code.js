@@ -7,7 +7,7 @@
 
 
 //create a new dropdown texture item
-var TEXTURE_DIR = "def_textures/";
+var TEXTURE_DIR = "textures/";
 var ALL_TEXTURES = [];
 var CUR_TEXTURE_LIST = [];  
 
@@ -113,6 +113,30 @@ function changeTexture(dd){
     CUR_TEXTURE_LIST[id] = dd.value;
     localStorage.tex_list = JSON.stringify(CUR_TEXTURE_LIST);
 }   
+
+//read the texture list from the input and parse them to the new list
+function readTextureFile(){
+    var file = document.getElementById("textureFile").files[0];
+    console.log("Got file: " + file.name);
+    var reader = new FileReader();
+    reader.onload = function(e){
+        var text = this.result;
+        var lines = text.split("\n");
+        if(lines.length > 0){
+            CUR_TEXTURE_LIST = [];
+            for (var i = 0; i < lines.length; i++){
+                if(lines[i].length > 0){
+                    let t = lines[i] != "" ? lines[i] : "air";
+                    CUR_TEXTURE_LIST.push(t);
+                }
+            }
+            makeTextures(CUR_TEXTURE_LIST.length,true);
+        }else{
+            alert("No textures found in file");
+        }
+    }
+    reader.readAsText(file);
+}
 
 
 ////////////     RENDERING FUNCTIONS    ////////////

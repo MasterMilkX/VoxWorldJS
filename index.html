@@ -96,7 +96,8 @@
                 <!-- allow import of dataset here -->
                 <div id="texSettings">
                     <input type="number" min="2" max="100" value="10" id="numTextures" onchange="makeTextures(this.value,true)">
-                    <button id="impTex">Import Texture Preset</button>
+                    <input type="file" id="textureFile" style="display: none;" accept=".txt" onchange="readTextureFile()"/>
+                    <button id="impTex" onclick="document.getElementById('textureFile').click();">Import Texture Preset</button>
                 </div>
             </div>
 
