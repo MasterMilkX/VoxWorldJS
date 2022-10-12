@@ -1,0 +1,211 @@
+/* import custom fonts */
+@font-face {font-family: Minecraft; src: url('Minecraft.ttf');}
+@font-face {font-family: Compact; src: url('compact.ttf');}
+
+/* general elements */
+body{
+    background-color: #8FCB5D;
+    color: #000;
+    font-family: monospace;
+}
+textarea{
+    font-family: monospace;
+}
+button{
+    font-family: monospace;
+}
+
+
+
+/* ids */
+#container{
+    width: 800px;
+    margin: 40px auto;
+    /* border:1px solid #477A1E; */
+    /* display:block; */
+}
+#header{
+    text-align:center;
+    padding-top:10px;
+    font-size:36px;
+    border:1px solid #cdcdcd;
+    border-radius:5px;
+    font-family: 'Minecraft';
+    background-color: #f7f7f7;
+}
+
+/* render section */
+#render{
+    width:460px;
+    text-align:center;
+    font-size:36px;
+    /* border:1px solid white; */
+    display:inline-block;
+    vertical-align: top;
+}
+#renderCanvas{
+    margin:35px 15px 5px 15px;
+    background-color: #efefef;
+    border:1px solid black;
+    border-radius:3px;
+    width:400px;
+    height:300px;
+}
+
+#dataView{
+    width:330px;
+    text-align: center;
+    /* border:1px solid blue; */
+    vertical-align: top;
+    display:inline-block;
+}
+
+/* data import section */
+#arr3din{
+    margin-top:20px;
+    border:1px solid black;
+}
+#texturekey{
+    margin:20px 10px 10px 15px;
+    border:1px solid black;
+    border-radius: 4px;
+    width:300px;
+    height:200px;
+    background-color: #ffffff;
+    overflow-y:scroll;
+}
+
+/* data import buttons */
+#datImport{
+    margin:20px 0px 10px 0px;
+}
+#datImport button{
+    margin:0px 5px 0px 5px;
+    padding:5px;
+}
+
+
+/* render options + menu */
+#menu{
+    width:460px;
+    /* border:1px solid yellow; */
+    text-align: center;
+}
+#menu > button{
+    margin:5px 10px 15px 10px;
+    padding:5px;
+    font-size:12px;
+    width:100px;
+}
+
+
+/* classes */
+
+/* textures */
+.tex_row{
+    display:table;
+    width:100%;
+    border-bottom:2px solid #e0e0e0;
+    background-color: #fff;
+}
+.tex_row:hover{
+    background-color: #f0f0f0;
+}
+.tex_row > div{
+    height:100%;
+    /* border:1px solid black; */
+    text-align:center;
+    display:table-cell;
+    vertical-align: middle;
+}
+.tex_id{
+    width:20%;
+    font-size:16px;
+}
+.tex_name{
+    width:60%;
+    font-size:18px;
+}
+.tex_select{
+    width:150px;
+    font-family: monospace;
+    text-align: center;
+    font-size:16px;
+    border:none;
+    background-color: transparent;
+    cursor:pointer;
+    appearance: none;
+    height:40px;
+
+}
+.tex_select::-ms-expand {
+    display: none;
+}
+.tex_select:focus{
+    outline:none;
+}
+.tex_img{
+    width:20%;
+}
+.tex_img > img{
+    width:30px;
+    margin-top:5px;
+}
+
+
+
+/* sliders  */
+.slideDiv{
+    width:420px;
+    text-align:right;
+    font-weight: bold;
+    padding-bottom:10px;
+    /* border:1px solid blue; */
+    margin:auto;
+}
+.slideDiv > .slider{
+    width: 300px;
+    vertical-align: middle;
+}
+
+/* change the appearance of the actual slider */
+/* from: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_rangeslider */
+.slider {
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    background: #efefef;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+}
+.slider:focus{
+    outline:none;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #477A1E;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #477A1E;
+    cursor: pointer;
+}
+
+.slidVal{
+    width: 40px;
+    text-align: center;
+    vertical-align: middle;
+    display:inline-block;
+    font-size:14px;
+}
