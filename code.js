@@ -2,14 +2,55 @@
 // Code by Milk + Github Copilot
 
 
+/////////////    GLOBAL VARIABLES     //////////////
+
+
+var TEXTURE_DIR = "textures/";
+var DEFAULT_TEXTURE_LIST = ["air","stone","dirt","planks_oak","sand","leaves_oak","glass","iron_block","log_oak","rail_normal","stone_slab_side"];
+var ALL_TEXTURES = [];
+var CUR_TEXTURE_LIST = [];  
+
+var CUR_STRUCTURE = [];
+
+/////////////  3D STRUCTURE FUNCTIONS  //////////////
+
+//import the 3d structure from the txt file
+function txt2array(txt){
+    var arr = JSON.parse(txt);
+    return arr;
+}
+
+//read in the text file and convert it to a 3d structure
+function readStructFile(){
+    var file = document.getElementById("structFile").files[0];
+    var reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function(){
+        CUR_STRUCTURE = txt2array(reader.result);
+        let shape = [CUR_STRUCTURE.length,CUR_STRUCTURE[0].length,CUR_STRUCTURE[0][0].length];
+        console.log("Imported structure: " + shape);
+    }
+}
+
+//read in the textarea's input 3d array
+function readStructTextArea(ta){
+    var text = ta.value;
+    //make sure it is valid json
+    try {
+        JSON.parse(text);
+    } catch (e) {
+        return false;
+    }
+    
+    CUR_STRUCTURE = txt2array(text);
+    let shape = [CUR_STRUCTURE.length,CUR_STRUCTURE[0].length,CUR_STRUCTURE[0][0].length];
+    console.log("Imported structure: " + shape);
+}
+
 
 /////////////    TEXTURE FUNCTIONS    //////////////
 
 
-//create a new dropdown texture item
-var TEXTURE_DIR = "textures/";
-var ALL_TEXTURES = [];
-var CUR_TEXTURE_LIST = [];  
 
 //import the list of textures from the JSON file (textures.json)
 function importTextures(){
@@ -117,7 +158,6 @@ function changeTexture(dd){
 //read the texture list from the input and parse them to the new list
 function readTextureFile(){
     var file = document.getElementById("textureFile").files[0];
-    console.log("Got file: " + file.name);
     var reader = new FileReader();
     reader.onload = function(e){
         var text = this.result;
@@ -132,7 +172,7 @@ function readTextureFile(){
             }
             makeTextures(CUR_TEXTURE_LIST.length,true);
         }else{
-            alert("No textures found in file");
+            alert("No textures found in file! Make sure the file is a .txt file with one texture name per line.");
         }
     }
     reader.readAsText(file);
@@ -157,7 +197,7 @@ function changeSlidePos(id, value){
 //initial function for the app
 function init(){
     //set default selected texture
-    CUR_TEXTURE_LIST = (localStorage.tex_list ? JSON.parse(localStorage.tex_list) : ["air","stone","dirt","planks_oak","sand","leaves_oak","glass","iron_block","log_oak","rail_normal","stone_slab_side"]);
+    CUR_TEXTURE_LIST = (localStorage.tex_list ? JSON.parse(localStorage.tex_list) : DEFAULT_TEXTURE_LIST);
     document.getElementById("numTextures").value = CUR_TEXTURE_LIST.length;
 
     //import the textures

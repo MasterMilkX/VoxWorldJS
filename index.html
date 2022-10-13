@@ -51,9 +51,10 @@
             <!-- import the data here -->
             <div id="dataView">
                 <!-- 3d structure -->
-                <textarea id="arr3din" rows="10" cols="35" placeholder="[[[Paste 3d Array Here]]]"></textarea>
+                <textarea id="arr3din" rows="10" cols="35" placeholder="[[[Paste 3d Array Here]]]" onchange="readStructTextArea(this)"></textarea>
                 <div id="datSettings">
-                    <button id="impArr3D">Import Structure</button>
+                    <input type="file" id="structFile" style="display: none;" accept=".txt" onchange="readStructFile()"/>
+                    <button id="impArr3D" onclick="document.getElementById('structFile').click();">Import Structure</button>
                 </div>
 
 
