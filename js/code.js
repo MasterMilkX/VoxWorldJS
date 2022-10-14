@@ -59,7 +59,7 @@ function importTextures(){
     // request.send(null);
     // ALL_TEXTURES = JSON.parse(request.responseText).textures;
     // console.log(ALL_TEXTURES);
-    fetch('./textures.json')
+    fetch('./'+ TEXTURE_DIR +'textures.json')
     .then((response) => response.json())
     .then((json) =>  {
         ALL_TEXTURES = json.textures;
@@ -180,6 +180,32 @@ function readTextureFile(){
 
 
 ////////////     RENDERING FUNCTIONS    ////////////
+
+//set up the canvas
+// const scene = new THREE.Scene();
+// scene.background = new THREE.Color( 0xdddddd );
+// const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+// const renderer = new THREE.WebGLRenderer();
+// renderer.setSize( window.innerWidth/2, window.innerHeight/2 );
+// document.body.appendChild( renderer.domElement );
+
+// //load a texture loader
+// const loader = new THREE.TextureLoader();
+
+// //add a light
+// const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+// scene.add(ambientLight);
+
+// const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+// directionalLight.position.set(10, 20, 0); // x, y, z
+// scene.add(directionalLight);
+
+
+
+
+
+
 
 
 //change the values of the angle and zoom
