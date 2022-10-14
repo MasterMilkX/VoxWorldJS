@@ -4,6 +4,7 @@
 
 /////////////    GLOBAL VARIABLES     //////////////
 
+var BG_COLOR = 0xfafafa;
 
 var TEXTURE_DIR = "textures/";
 var DEFAULT_TEXTURE_LIST = ["air","stone","dirt","planks_oak","sand","leaves_oak","glass","iron_block","log_oak","rail_normal","stone_slab_side"];
@@ -13,7 +14,7 @@ var TEXTURE_PNG = [];
 
 var CUR_STRUCTURE = [];
 
-var RADIUS = 10;
+var RADIUS = 15;
 var ANGLE = 0;
 var CENTER_Y = 2;
 
@@ -30,7 +31,7 @@ RENDERER.setSize(400, 300);
 
 //setup scene and camera
 const SCENE = new THREE.Scene();
-SCENE.background = new THREE.Color( 0xfafafa ).convertSRGBToLinear();
+SCENE.background = new THREE.Color( BG_COLOR ).convertSRGBToLinear();
 const CAMERA = new THREE.PerspectiveCamera( 75, rendCanvas.clientWidth / rendCanvas.clientHeight, 0.1, 1000);
 
 //load a texture loader
@@ -180,14 +181,8 @@ function readTextureFile(){
 
 //import the 3d structure from the txt file
 function txt2array(txt){
-    try{
-        var arr = JSON.parse(txt);
-        return arr;
-    }catch(error){
-        alert("Invalid file! \nMake sure the file is a .txt file with a 3D array of integers.");
-        return [];
-    }
-    
+    var arr = JSON.parse(txt);
+    return arr;
 }
 
 //read in the text file and convert it to a 3d structure
@@ -210,14 +205,14 @@ function readStructTextArea(ta){
     //make sure it is valid json
     try {
         JSON.parse(text);
+        CUR_STRUCTURE = txt2array(text);
+        localStorage.struct = JSON.stringify(CUR_STRUCTURE);
+        let shape = [CUR_STRUCTURE.length,CUR_STRUCTURE[0].length,CUR_STRUCTURE[0][0].length];
+        console.log("Imported structure: " + shape);
     } catch (e) {
+        alert("Invalid file! \nMake sure the file is a .txt file with a 3D array of integers.");
         return false;
     }
-    
-    CUR_STRUCTURE = txt2array(text);
-    localStorage.struct = JSON.stringify(CUR_STRUCTURE);
-    let shape = [CUR_STRUCTURE.length,CUR_STRUCTURE[0].length,CUR_STRUCTURE[0][0].length];
-    console.log("Imported structure: " + shape);
 }
 
 
@@ -268,8 +263,11 @@ function make3dStructure(arr3d,offset=[0,0,0]){
 
     //move the camera up some to account for new height
     CENTER_Y = Math.max(2,structCen[1]);
+    document.getElementById("heightView").value = CENTER_Y;
+    document.getElementById("heightViewVal").value = CENTER_Y;
     
-    resetCamera();
+    // resetCamera();
+    rotateCam(ANGLE,CENTER_Y,RADIUS)
 
     //add the structure to the scene
     SCENE.add(structObj);
@@ -282,15 +280,25 @@ function make3dStructure(arr3d,offset=[0,0,0]){
 
 //reset the camera's angle and position
 function resetCamera(){
-    CAMERA.position.set(0,CENTER_Y,RADIUS);
-    rotateCam(180,RADIUS)
+    ANGLE = 180;
+    RADIUS = 10;
+
+    //update the inputs
+    document.getElementById("angleView").value = ANGLE;
+    document.getElementById("angleViewVal").value = ANGLE;
+    document.getElementById("zoomView").value = RADIUS;
+    document.getElementById("zoomViewVal").value = RADIUS;
+
+
+    rotateCam(ANGLE,CENTER_Y,RADIUS)
 }
 
 //rotate the camera around the structure
-function rotateCam(angle,radius=10){
+function rotateCam(angle,height,radius){
+    CAMERA.position.y = height;
     CAMERA.position.x = radius * Math.cos( angle * (Math.PI/180) );  
     CAMERA.position.z = radius * Math.sin( angle * (Math.PI/180) ); 
-    CAMERA.lookAt(0,CENTER_Y,0);
+    CAMERA.lookAt(0,height,0);
 }
 
 
@@ -303,9 +311,11 @@ function changeSlideVal(id, value) {
         ANGLE = value;
     else if(id.includes("zoom"))
         RADIUS = value;
+    else if(id.includes("height"))
+        CENTER_Y = value;
 
     //update the camera
-    rotateCam(ANGLE,RADIUS);
+    rotateCam(ANGLE,CENTER_Y,RADIUS);
 }
 function changeSlidePos(id, value){
     //update the values
@@ -315,12 +325,36 @@ function changeSlidePos(id, value){
         ANGLE = value;
     else if(id.includes("zoom"))
         RADIUS = value;
+    else if(id.includes("height"))
+        CENTER_Y = value;
 
     //update the camera
-    rotateCam(ANGLE,RADIUS);
+    rotateCam(ANGLE,CENTER_Y,RADIUS);
 
 }
 
+
+
+
+//make the structure on startup if the textures are loaded
+let init_tries = 0;
+function initStruct(){
+    //don't try more than 10 times
+    if(init_tries>10)
+        return;
+
+    //check if the textures are loaded
+    for(let i = 0; i < TEXTURE_PNG.length; i++){
+        //not finished loading
+        if(TEXTURE_PNG[i] == null){
+            init_tries++;
+            setTimeout(initStruct,500);
+            return;
+        }
+    }
+    //finished loading
+    make3dStructure(CUR_STRUCTURE);
+}
 
 
 //initial function for the app
@@ -336,6 +370,7 @@ function init(){
     CUR_STRUCTURE = (localStorage.struct ? JSON.parse(localStorage.struct) : []);
     if(CUR_STRUCTURE.length > 0){
         document.getElementById("arr3din").value = JSON.stringify(CUR_STRUCTURE);
+        setTimeout(initStruct,500); //load the last structure if available
     }
 
     //reset the camera

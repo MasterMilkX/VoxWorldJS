@@ -10,13 +10,35 @@
                QUICK STYLES CHECK 
                MOVE TO STYLES.CSS LATER
             */
+           
+            #sliderHide{
+                display: block;
+            }
+            #sliderControls{
+                display: none;
+            }
 
             
+           
            
         </style>
 
         <!-- import three.js -->
         <script src="js/three.js"></script>
+        <script>
+            //toggle the display of the slider menu
+            function toggleControls(){
+                var show_menu = document.getElementById("sliderControls");
+                var hide_menu = document.getElementById("sliderHide");
+                if(show_menu.style.display == "none" || show_menu.style.display == ""){
+                    show_menu.style.display = "block";
+                    hide_menu.style.display = "none";
+                }else{
+                    show_menu.style.display = "none";
+                    hide_menu.style.display = "block";
+                }
+            }
+        </script>
     </head>
     <body onload="init()">
         <div id="container">
@@ -37,23 +59,38 @@
                     <button id="expGIFBtn">Export GIF</button>
                 
                     <!-- zoom + angle sliders -->
-                    <div class="slideDiv">
-                        Angle: 
-                        <input type="range" min="1" max="360" value="180" class="slider" id="angleView" oninput="changeSlideVal('angleViewVal',this.value)">
-                        <input type='number' class='slidVal' id="angleViewVal"  min="0" max="360" step="10" value="180"  onchange="changeSlidePos('angleView',this.value)">
+                    <div id="sliderHide">
+                        <button style="width:170px;margin-top:20px" onclick="toggleControls()">Show Control View</button>
                     </div>
-                    <div class="slideDiv">
-                        Distance: 
-                        <input type="range" min="1" max="100" value="10" class="slider" id="zoomView" oninput="changeSlideVal('zoomViewVal',this.value)">
-                        <input type='number' class='slidVal' id="zoomViewVal" min="1" max="100" value="10" onchange="changeSlidePos('zoomView',this.value)">
+                    <div id="sliderControls">
+                        <div class="slideDiv">
+                            Angle: 
+                            <input type="range" min="1" max="360" value="180" class="slider" id="angleView" oninput="changeSlideVal('angleViewVal',this.value)">
+                            <input type='number' class='slidVal' id="angleViewVal"  min="0" max="360" step="10" value="180"  onchange="changeSlidePos('angleView',this.value)">
+                        </div>
+                        <div class="slideDiv">
+                            Distance: 
+                            <input type="range" min="1" max="100" value="15" class="slider" id="zoomView" oninput="changeSlideVal('zoomViewVal',this.value)">
+                            <input type='number' class='slidVal' id="zoomViewVal" min="1" max="100" value="15" onchange="changeSlidePos('zoomView',this.value)">
+                        </div>
+                        <div class="slideDiv">
+                            Height: 
+                            <input type="range" min="-64" max="64" value="2" class="slider" id="heightView" oninput="changeSlideVal('heightViewVal',this.value)">
+                            <input type='number' class='slidVal' id="heightViewVal" min="-64" max="64" value="5" onchange="changeSlidePos('heightView',this.value)">
+                        </div>
+                        <button style="width:180px;margin-top:8px;" onclick="toggleControls()">Hide Control View</button>
                     </div>
-
+                    
                 </div>
             </div>
             
             <!-- import the data here -->
             <div id="dataView">
                 <!-- 3d structure -->
+                <div id="datSetTop">
+                    <button id="fullImport">Import Structure + Texture JSON</button>
+                </div>
+                
                 <textarea id="arr3din" rows="10" cols="35" placeholder="[[[Paste 3d Array Here]]]" onchange="readStructTextArea(this)"></textarea>
                 <div id="datSettings">
                     <input type="file" id="structFile" style="display: none;" accept=".txt" onchange="readStructFile()"/>
@@ -86,7 +123,8 @@
                 <div id="texSettings">
                     <input type="number" min="2" max="100" value="10" id="numTextures" onchange="makeTextures(this.value,true)">
                     <input type="file" id="textureFile" style="display: none;" accept=".txt" onchange="readTextureFile()"/>
-                    <button id="impTex" onclick="document.getElementById('textureFile').click();">Import Texture Preset</button>
+                    <button id="impTex" onclick="document.getElementById('textureFile').click();">Import Set</button>
+                    <button id="expTex" onclick="">Export Set</button>
                 </div>
             </div>
 
