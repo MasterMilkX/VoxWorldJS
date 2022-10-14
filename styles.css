@@ -50,6 +50,12 @@ button{
     border-radius:3px;
     width:400px;
     height:300px;
+
+    /* scale up pixels */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
 
 #dataView{

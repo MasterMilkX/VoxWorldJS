@@ -1,4 +1,4 @@
-# Converts a numpy .npy file to a txt file (for use with the web app)
+# Converts a 3d numpy .npy file to a txt file (for use with the web app)
 # code from: https://pynative.com/python-serialize-numpy-ndarray-into-json/
 # usage: python3 npy2json.py <npy file input> (<txt file output>)
 #        note -> txt name is optional, otherwise it will be the same as the npy file

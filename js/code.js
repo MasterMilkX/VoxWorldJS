@@ -15,19 +15,23 @@ var CUR_STRUCTURE = [];
 
 var RADIUS = 10;
 var ANGLE = 0;
+var CENTER_Y = 2;
 
 
 //////////////      THREE.JS SETUP     ///////////////
 
+var rendCanvas = document.getElementById("renderCanvas");
+
 //set up the canvas
+const RENDERER = new THREE.WebGLRenderer({canvas: rendCanvas, antialias: false});
+RENDERER.setSize(400, 300);
+// RENDERER.domElement.id = "renderCanvas";
+// document.getElementById("render").appendChild(RENDERER.domElement);
+
+//setup scene and camera
 const SCENE = new THREE.Scene();
 SCENE.background = new THREE.Color( 0xfafafa ).convertSRGBToLinear();
-const CAMERA = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-const RENDERER = new THREE.WebGLRenderer();
-RENDERER.setSize(400, 300);
-RENDERER.domElement.id = "renderCanvas";
-document.getElementById("render").appendChild(RENDERER.domElement);
+const CAMERA = new THREE.PerspectiveCamera( 75, rendCanvas.clientWidth / rendCanvas.clientHeight, 0.1, 1000);
 
 //load a texture loader
 const loader = new THREE.TextureLoader();
@@ -218,12 +222,13 @@ function readStructTextArea(ta){
 
 
 
+
 ////////////     RENDERING FUNCTIONS    ////////////
 
 
 
 //make the structure given a 3d array
-//represented as y,x,z in the 3d array
+//represented as x,y,z in the 3d array
 function make3dStructure(arr3d,offset=[0,0,0]){
     //check if a structure was passed
     if(arr3d == null || arr3d.length == 0){
@@ -237,8 +242,7 @@ function make3dStructure(arr3d,offset=[0,0,0]){
     }
 
     //default offset
-    let def_off = [0.5,-0.5,0.5];
-    // let def_off = [-0.5,0.5,0.5];
+    let def_off = [0.5,0.5,0.5];
     let off = [offset[0]+def_off[0],offset[1]+def_off[1],offset[2]+def_off[2]];
 
     //get the structure properties
@@ -254,7 +258,7 @@ function make3dStructure(arr3d,offset=[0,0,0]){
                     let geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
                     let  material = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[arr3d[i][j][k]],transparent: true});
                     let cube = new THREE.Mesh( geometry, material );
-                    cube.position.set(j+off[0]-structCen[1],structDim[0]-i+off[1],k+off[2]-structCen[2]);  //top down of the array (reverse y)
+                    cube.position.set(i+off[0]-structCen[0],structDim[1]-j+off[1],k+off[2]-structCen[2]);
                     structObj.add(cube);
                 }
             }
@@ -262,22 +266,31 @@ function make3dStructure(arr3d,offset=[0,0,0]){
     }
     console.log("Rendering structure!");
 
+    //move the camera up some to account for new height
+    CENTER_Y = Math.max(2,structCen[1]);
+    
+    resetCamera();
+
     //add the structure to the scene
     SCENE.add(structObj);
+
+
+
     
+
 }
 
 //reset the camera's angle and position
 function resetCamera(){
-    CAMERA.position.set(0,5,RADIUS);
-    CAMERA.lookAt(0,5,0);
+    CAMERA.position.set(0,CENTER_Y,RADIUS);
+    rotateCam(180,RADIUS)
 }
 
 //rotate the camera around the structure
 function rotateCam(angle,radius=10){
     CAMERA.position.x = radius * Math.cos( angle * (Math.PI/180) );  
     CAMERA.position.z = radius * Math.sin( angle * (Math.PI/180) ); 
-    CAMERA.lookAt(0,5,0);
+    CAMERA.lookAt(0,CENTER_Y,0);
 }
 
 
@@ -323,7 +336,6 @@ function init(){
     CUR_STRUCTURE = (localStorage.struct ? JSON.parse(localStorage.struct) : []);
     if(CUR_STRUCTURE.length > 0){
         document.getElementById("arr3din").value = JSON.stringify(CUR_STRUCTURE);
-        make3dStructure(CUR_STRUCTURE);
     }
 
     //reset the camera
