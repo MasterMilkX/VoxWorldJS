@@ -1,8 +1,8 @@
 TODO
 [ ] Create a .sh script that takes the images in "textures/" and prints them to a JSON file as a array (command in bash is: `ls -1 | sed -e 's/\.png$//'`)
 [X] Import 3D arrays for structures as a npy or txt file
-[ ] Allow importing both structures and texture presetting together as a single JSON file
+[X] Allow importing both structures and texture presetting together as a single JSON file
 [X] Actually 3d render the objects lol
 [ ] Export to PNG + GIF
-[ ] Allow height changes
+[X] Allow height changes
 [ ] Headless Node.JS version of the code

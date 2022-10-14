@@ -44,7 +44,7 @@ button{
     vertical-align: top;
 }
 #renderCanvas{
-    margin:45px 5px 20px 30px;
+    margin:25px 5px 15px 30px;
     background-color: #efefef;
     border:1px solid black;
     border-radius:3px;
@@ -72,8 +72,10 @@ button{
 #datSetTop{
     margin-top:25px;
 }
-#fullImport{
+#datSetTop button{
     padding:5px;
+    margin-left:5px;
+    margin-right:5px;
 }
 
 #arr3din{

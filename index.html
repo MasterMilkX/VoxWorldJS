@@ -86,12 +86,14 @@
             
             <!-- import the data here -->
             <div id="dataView">
-                <!-- 3d structure -->
+                <!-- 3d structure + textures -->
                 <div id="datSetTop">
-                    <button id="fullImport">Import Structure + Texture JSON</button>
+                    <input type="file" id="fullJSONFile" style="display: none;" accept=".json" onchange="importFullJSON()"/>
+                    <button id="fullImport" onclick="document.getElementById('fullJSONFile').click();">Import JSON</button>
+                    <button id="fullExport" onclick="exportFullJSON()">Export JSON</button>
                 </div>
-                
-                <textarea id="arr3din" rows="10" cols="35" placeholder="[[[Paste 3d Array Here]]]" onchange="readStructTextArea(this)"></textarea>
+                <!-- 3d structure -->
+                <textarea id="arr3din" rows="10" cols="35" placeholder="[[[Paste 3d Array Here]]]" onchange="readStructTextArea(this.value)"></textarea>
                 <div id="datSettings">
                     <input type="file" id="structFile" style="display: none;" accept=".txt" onchange="readStructFile()"/>
                     <button id="impArr3D" onclick="document.getElementById('structFile').click();">Import Structure</button>
@@ -124,7 +126,7 @@
                     <input type="number" min="2" max="100" value="10" id="numTextures" onchange="makeTextures(this.value,true)">
                     <input type="file" id="textureFile" style="display: none;" accept=".txt" onchange="readTextureFile()"/>
                     <button id="impTex" onclick="document.getElementById('textureFile').click();">Import Set</button>
-                    <button id="expTex" onclick="">Export Set</button>
+                    <button id="expTex" onclick="exportTextureSet()">Export Set</button>
                 </div>
             </div>
 

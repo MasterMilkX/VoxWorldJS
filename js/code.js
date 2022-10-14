@@ -7,7 +7,7 @@
 var BG_COLOR = 0xfafafa;
 
 var TEXTURE_DIR = "textures/";
-var DEFAULT_TEXTURE_LIST = ["air","stone","dirt","planks_oak","sand","leaves_oak","glass","iron_block","log_oak","rail_normal","stone_slab_side"];
+var DEFAULT_TEXTURE_LIST = ["air","stonebrick","dirt","planks_oak","sand","iron_bars","glass","iron_block","log_oak","wool_colored_red","stone_slab_side"];
 var ALL_TEXTURES = [];
 var CUR_TEXTURE_LIST = [];  
 var TEXTURE_PNG = [];
@@ -44,6 +44,32 @@ SCENE.add(ambientLight);
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
 directionalLight.position.set(10, 20, 0); // x, y, z
 SCENE.add(directionalLight);
+
+
+
+//////////////     GENERAL FUNCTIONS    ///////////////
+
+
+//create a downloadable file the data passed
+function makeDownload(data,filename){
+    //make it a downloadable text
+    let file = new Blob([data], {type: 'text/plain'});
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(file, filename);
+    else { // Others
+        let a = document.createElement("a"),
+        url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        //simultate clicking and downloading the link
+        a.click();
+        setTimeout(function() {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+    }
+}
 
 
 
@@ -176,14 +202,20 @@ function readTextureFile(){
 }
 
 
+//export the texture set to a .txt file
+function exportTextureSet(){
+    //make the text file
+    let text = "";
+    for (let i = 0; i < CUR_TEXTURE_LIST.length; i++){
+        text += CUR_TEXTURE_LIST[i] + "\n";
+    }
+    let filename = "texture_set.txt";
+    makeDownload(text,filename);
+}
+
+
 
 /////////////  3D STRUCTURE FUNCTIONS  //////////////
-
-//import the 3d structure from the txt file
-function txt2array(txt){
-    var arr = JSON.parse(txt);
-    return arr;
-}
 
 //read in the text file and convert it to a 3d structure
 function readStructFile(){
@@ -191,28 +223,78 @@ function readStructFile(){
     var reader = new FileReader();
     reader.readAsText(file);
     reader.onload = function(){
-        CUR_STRUCTURE = txt2array(reader.result);
-        localStorage.struct = JSON.stringify(CUR_STRUCTURE);
-        let shape = [CUR_STRUCTURE.length,CUR_STRUCTURE[0].length,CUR_STRUCTURE[0][0].length];
-        console.log("Imported structure: " + shape);
-        document.getElementById("arr3din").value = JSON.stringify(CUR_STRUCTURE);
+        try{
+            CUR_STRUCTURE = txt2array(reader.result);
+            localStorage.struct = JSON.stringify(CUR_STRUCTURE);
+            let shape = [CUR_STRUCTURE.length,CUR_STRUCTURE[0].length,CUR_STRUCTURE[0][0].length];
+            console.log("Imported structure: " + shape);
+            document.getElementById("arr3din").value = JSON.stringify(CUR_STRUCTURE);
+        }catch(e){
+            alert("Error parsing structure file! \nMake sure the file is a .txt file with a valid 3d array.");
+            return [];
+        }
     }
 }
 
 //read in the textarea's input 3d array
-function readStructTextArea(ta){
-    var text = ta.value;
+function readStructTextArea(text){
     //make sure it is valid json
     try {
-        JSON.parse(text);
-        CUR_STRUCTURE = txt2array(text);
+        CUR_STRUCTURE = JSON.parse(text);
         localStorage.struct = JSON.stringify(CUR_STRUCTURE);
         let shape = [CUR_STRUCTURE.length,CUR_STRUCTURE[0].length,CUR_STRUCTURE[0][0].length];
         console.log("Imported structure: " + shape);
     } catch (e) {
-        alert("Invalid file! \nMake sure the file is a .txt file with a 3D array of integers.");
-        return false;
+        console.log("cannot parse array: " + text);
+        alert("Invalid 3d structure! \nMake sure the text input is a 3D array of integers.");
+        return [];
     }
+}
+
+
+
+/////////////  STRUCT + TEXTURE FUNCTIONS  //////////////
+
+//import both the structure and the texture set from a json file
+function importFullJSON(){
+    var file = document.getElementById("fullJSONFile").files[0];
+    var reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function(){
+        //parse the json
+        try{
+            var data = JSON.parse(reader.result);
+            console.log(data)
+            readStructTextArea(data.structure);
+            CUR_TEXTURE_LIST = data.texture_set;
+            localStorage.struct = JSON.stringify(CUR_STRUCTURE);
+            localStorage.tex_list = JSON.stringify(CUR_TEXTURE_LIST);
+
+            //update the texture list
+            makeTextures(CUR_TEXTURE_LIST.length,true);
+
+            //update the structure
+            if(CUR_STRUCTURE.length > 0){
+                document.getElementById("arr3din").value = JSON.stringify(CUR_STRUCTURE);
+                make3dStructure(CUR_STRUCTURE);
+            }
+        }catch(e){
+            console.log(e);
+            alert("Invalid JSON file! \nMake sure the file is a .json file with 'structure' and 'texture_set' data.");
+        }
+    }
+}
+
+//export both the structure and the texture set to a .json file
+function exportFullJSON(){
+    //make the json file
+    let dat = {
+        "structure": JSON.stringify(CUR_STRUCTURE),
+        "texture_set": CUR_TEXTURE_LIST
+    }
+    let text = JSON.stringify(dat, null, 3);
+    let filename = "full_set.json";
+    makeDownload(text,filename);
 }
 
 
@@ -251,7 +333,7 @@ function make3dStructure(arr3d,offset=[0,0,0]){
             for(let k = 0; k < arr3d[i][j].length; k++){
                 if(CUR_TEXTURE_LIST[arr3d[i][j][k]] != "air"){
                     let geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-                    let  material = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[arr3d[i][j][k]],transparent: true});
+                    let  material = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[arr3d[i][j][k]] ,transparent: true});
                     let cube = new THREE.Mesh( geometry, material );
                     cube.position.set(i+off[0]-structCen[0],structDim[1]-j+off[1],k+off[2]-structCen[2]);
                     structObj.add(cube);
@@ -272,11 +354,16 @@ function make3dStructure(arr3d,offset=[0,0,0]){
     //add the structure to the scene
     SCENE.add(structObj);
 
-
-
-    
-
 }
+
+//export the canvas as a png
+function exportPNG(){
+    
+}
+
+
+
+
 
 //reset the camera's angle and position
 function resetCamera(){
@@ -284,10 +371,7 @@ function resetCamera(){
     RADIUS = 10;
 
     //update the inputs
-    document.getElementById("angleView").value = ANGLE;
-    document.getElementById("angleViewVal").value = ANGLE;
-    document.getElementById("zoomView").value = RADIUS;
-    document.getElementById("zoomViewVal").value = RADIUS;
+    updateSliders();
 
 
     rotateCam(ANGLE,CENTER_Y,RADIUS)
@@ -299,6 +383,10 @@ function rotateCam(angle,height,radius){
     CAMERA.position.x = radius * Math.cos( angle * (Math.PI/180) );  
     CAMERA.position.z = radius * Math.sin( angle * (Math.PI/180) ); 
     CAMERA.lookAt(0,height,0);
+
+    //update localstorages to import when the page is reloaded
+    localStorage.angle = ANGLE;
+    localStorage.radius = RADIUS;
 }
 
 
@@ -333,7 +421,13 @@ function changeSlidePos(id, value){
 
 }
 
-
+//update the sliders with the current set values
+function updateSliders(){
+    document.getElementById("angleView").value = ANGLE;
+    document.getElementById("angleViewVal").value = ANGLE;
+    document.getElementById("zoomView").value = RADIUS;
+    document.getElementById("zoomViewVal").value = RADIUS;
+}
 
 
 //make the structure on startup if the textures are loaded
@@ -372,6 +466,12 @@ function init(){
         document.getElementById("arr3din").value = JSON.stringify(CUR_STRUCTURE);
         setTimeout(initStruct,500); //load the last structure if available
     }
+
+    //import the camera angle and zoom
+    ANGLE = (localStorage.angle ? localStorage.angle : 180);
+    RADIUS = (localStorage.radius ? localStorage.radius : 10);
+    updateSliders();
+
 
     //reset the camera
     resetCamera();

@@ -1,0 +1,11 @@
+air
+stonebrick
+dirt
+planks_oak
+sand
+iron_bars
+glass
+iron_block
+log_oak
+wool_colored_red
+stone_slab_side
