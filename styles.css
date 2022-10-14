@@ -44,7 +44,7 @@ button{
     vertical-align: top;
 }
 #renderCanvas{
-    margin:35px 15px 5px 15px;
+    margin:35px 5px 20px 30px;
     background-color: #efefef;
     border:1px solid black;
     border-radius:3px;
@@ -172,7 +172,7 @@ button{
     margin:auto;
 }
 .slideDiv > .slider{
-    width: 300px;
+    width: 280px;
     vertical-align: middle;
 }
 

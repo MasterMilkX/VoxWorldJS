@@ -14,6 +14,9 @@
             
            
         </style>
+
+        <!-- import three.js -->
+        <script src="js/three.js"></script>
     </head>
     <body onload="init()">
         <div id="container">
@@ -24,13 +27,13 @@
             <!-- render the structure here -->
             <div style="display:inline-block">
                 <div id="render">
-                    <canvas id="renderCanvas"></canvas>
+                    <!-- <canvas id="renderCanvas"></canvas> -->
                 </div>
                  <!-- option buttons / menu here -->
                 <div id="menu">
                     <!-- buttons -->
                     <button id="expPNGBtn">Export PNG</button>
-                    <button id="renderBtn">RENDER</button>
+                    <button id="renderBtn" onclick="make3dStructure(CUR_STRUCTURE)">RENDER</button>
                     <button id="expGIFBtn">Export GIF</button>
                 
                     <!-- zoom + angle sliders -->
@@ -40,9 +43,9 @@
                         <input type='number' class='slidVal' id="angleViewVal"  min="0" max="360" step="10" value="180"  onchange="changeSlidePos('angleView',this.value)">
                     </div>
                     <div class="slideDiv">
-                        Zoom: 
+                        Distance: 
                         <input type="range" min="1" max="20" value="10" class="slider" id="zoomView" oninput="changeSlideVal('zoomViewVal',this.value)">
-                        <input type='number' class='slidVal' id="zoomViewVal" min="1" max="20" value="10" onchange="changeSlidePos('zoomView',this.value)">
+                        <input type='number' class='slidVal' id="zoomViewVal" min="1" max="100" value="10" onchange="changeSlidePos('zoomView',this.value)">
                     </div>
 
                 </div>
@@ -76,21 +79,6 @@
                             </select>
                         </div>
                         <div class="tex_img"><img src="textures/cobblestone.png"></div>
-                    </div>
-                    <div class="tex_row">
-                        <div class="tex_id">2</div>
-                        <div class="tex_name"><select class="tex_select"><option>???</option></select></div>
-                        <div class="tex_img"><img src="textures/dirt.png"></div>
-                    </div>
-                    <div class="tex_row">
-                        <div class="tex_id">3</div>
-                        <div class="tex_name"><select class="tex_select"><option>???</option></select></div>
-                        <div class="tex_img"><img src="textures/planks_oak.png"></div>
-                    </div>
-                    <div class="tex_row">
-                        <div class="tex_id">100</div>
-                        <div class="tex_name"><select class="tex_select"><option>???</option></select></div>
-                        <div class="tex_img"><img src="textures/diamond_block.png"></div>
                     </div>
                 </div>
 

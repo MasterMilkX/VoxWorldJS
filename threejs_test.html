@@ -174,10 +174,27 @@
 
             camera.position.y = 5;
 
-            function rotateCam(angle,radius=10){
+            // function rotateCam(angle,radius=10){
+            //     camera.lookAt(0,5,0);
+            //     camera.position.x = radius * Math.cos( angle );  
+            //     camera.position.z = radius * Math.sin( angle ); 
+            // }
+
+            
+
+            //rotate the camera around the structure
+            // function rotateCam(angle,radius=10){
+            //     camera.lookAt(0,5,0);
+            //     camera.position.x = radius * Math.cos( angle * (Math.PI/180) );  
+            //     camera.position.z = radius * Math.sin( angle * (Math.PI/180) ); 
+            // }
+
+
+            //make the camera go to a particular angle of the structure
+            function gotoAngle(){
+                camera.position.x = RADIUS * Math.cos( ANGLE * (Math.PI/180) );  
+                camera.position.z = RADIUS * Math.sin( ANGLE * (Math.PI/180) ); 
                 camera.lookAt(0,5,0);
-                camera.position.x = radius * Math.cos( angle );  
-                camera.position.z = radius * Math.sin( angle ); 
             }
             
             
@@ -193,17 +210,27 @@
             camera.position.y = 5;
             camera.position.z = RADIUS;
 
+            // camera.position.set(0,30,0);
+            // camera.lookAt(0,0,0);
+
             //render and control the scene
+            let RPS = 1;
+            let interval = (360*RPS)/1000
             function main() {
                 requestAnimationFrame( main );
                 renderer.render( scene, camera );
 
-                if(ROTATE)
-                    rotateCam(ANGLE+=1/60,RADIUS)
+                if(ROTATE){
+                    document.getElementById("debug").innerHTML = "ANGLE: " + Math.round(ANGLE) + " | INTERVAL: " + interval;
+                    // rotateCam(ANGLE,RADIUS)
+                    gotoAngle(ANGLE,RADIUS);
+                }
+                    
 
-                // document.getElementById("debug").innerHTML = "ANGLE: " + ANGLE;
+                
             }
-
+            
+            setInterval(function(){ANGLE = (ANGLE + interval) % 360;},1)
 
             /////////////////   HTML5 FUNCTIONS  //////////////////
 
