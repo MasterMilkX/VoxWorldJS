@@ -24,7 +24,7 @@ var CENTER_Y = 2;
 var rendCanvas = document.getElementById("renderCanvas");
 
 //set up the canvas
-const RENDERER = new THREE.WebGLRenderer({canvas: rendCanvas, antialias: false});
+const RENDERER = new THREE.WebGLRenderer({canvas: rendCanvas, antialias: false, preserveDrawingBuffer: true });
 RENDERER.setSize(400, 300);
 // RENDERER.domElement.id = "renderCanvas";
 // document.getElementById("render").appendChild(RENDERER.domElement);
@@ -215,7 +215,10 @@ function exportTextureSet(){
 
 
 
+
 /////////////  3D STRUCTURE FUNCTIONS  //////////////
+
+
 
 //read in the text file and convert it to a 3d structure
 function readStructFile(){
@@ -224,7 +227,7 @@ function readStructFile(){
     reader.readAsText(file);
     reader.onload = function(){
         try{
-            CUR_STRUCTURE = txt2array(reader.result);
+            CUR_STRUCTURE = JSON.parse(reader.result);
             localStorage.struct = JSON.stringify(CUR_STRUCTURE);
             let shape = [CUR_STRUCTURE.length,CUR_STRUCTURE[0].length,CUR_STRUCTURE[0][0].length];
             console.log("Imported structure: " + shape);
@@ -254,6 +257,7 @@ function readStructTextArea(text){
 
 
 /////////////  STRUCT + TEXTURE FUNCTIONS  //////////////
+
 
 //import both the structure and the texture set from a json file
 function importFullJSON(){
@@ -358,7 +362,36 @@ function make3dStructure(arr3d,offset=[0,0,0]){
 
 //export the canvas as a png
 function exportPNG(){
+    let filename = "vox_struct.png";
+    let data = RENDERER.domElement.toDataURL("image/png");
+
+    //make a fake image to download
+    let img = document.createElement("img");
+    img.width = rendCanvas.width;
+    img.height = rendCanvas.height;
+    img.src = data;
+    img.style.display = "none";
+    document.body.appendChild(img);
     
+    //make a custom image download
+    let a = document.createElement("a");
+    a.href = img.src;
+    a.download = filename;
+    document.body.appendChild(a);
+
+    //simultate clicking and downloading the link
+    a.click();
+    setTimeout(function() {
+        //remove the fake image and link
+        document.body.removeChild(a);
+        document.body.removeChild(img);
+    }, 0); 
+    
+}
+
+//export the rotation of the building as a gif
+function exportGIF(){
+
 }
 
 
@@ -467,16 +500,12 @@ function init(){
         setTimeout(initStruct,500); //load the last structure if available
     }
 
-    //import the camera angle and zoom
+    //import the camera angle and zoom 
     ANGLE = (localStorage.angle ? localStorage.angle : 180);
     RADIUS = (localStorage.radius ? localStorage.radius : 10);
     updateSliders();
-
-
-    //reset the camera
-    resetCamera();
+    rotateCam(ANGLE,CENTER_Y,RADIUS);
 }
-
 
 //animation loop and rendering
 function main(){

@@ -54,13 +54,15 @@
                  <!-- option buttons / menu here -->
                 <div id="menu">
                     <!-- buttons -->
-                    <button id="expPNGBtn">Export PNG</button>
+                    <button id="expPNGBtn" onclick="exportPNG()">Export PNG</button>
                     <button id="renderBtn" onclick="make3dStructure(CUR_STRUCTURE)">RENDER</button>
                     <button id="expGIFBtn">Export GIF</button>
                 
                     <!-- zoom + angle sliders -->
-                    <div id="sliderHide">
+                    <div id="sliderHide" style="text-align:center">
                         <button style="width:170px;margin-top:20px" onclick="toggleControls()">Show Control View</button>
+                        <!-- <br> -->
+                        <!-- <img id='preview' width="64" height="48" style="margin-top:20px"> -->
                     </div>
                     <div id="sliderControls">
                         <div class="slideDiv">
