@@ -25,6 +25,10 @@
 
         <!-- import three.js -->
         <script src="js/three.js"></script>
+
+        <!-- import CCapture for gif generation -->
+        <script src="js/CCapture.all.min.js"></script>
+        
         <script>
             //toggle the display of the slider menu
             function toggleControls(){
@@ -56,11 +60,12 @@
                     <!-- buttons -->
                     <button id="expPNGBtn" onclick="exportPNG()">Export PNG</button>
                     <button id="renderBtn" onclick="make3dStructure(CUR_STRUCTURE)">RENDER</button>
-                    <button id="expGIFBtn">Export GIF</button>
+                    <button id="expGIFBtn" onclick="exportGIF()">Export GIF</button>
                 
                     <!-- zoom + angle sliders -->
                     <div id="sliderHide" style="text-align:center">
                         <button style="width:170px;margin-top:20px" onclick="toggleControls()">Show Control View</button>
+                        <!-- <p id="angDebug">Angle: 0</p> -->
                         <!-- <br> -->
                         <!-- <img id='preview' width="64" height="48" style="margin-top:20px"> -->
                     </div>

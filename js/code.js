@@ -19,6 +19,8 @@ var ANGLE = 0;
 var CENTER_Y = 2;
 
 
+
+
 //////////////      THREE.JS SETUP     ///////////////
 
 var rendCanvas = document.getElementById("renderCanvas");
@@ -45,6 +47,13 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
 directionalLight.position.set(10, 20, 0); // x, y, z
 SCENE.add(directionalLight);
 
+
+
+//////////////      CCAPTURE SETUP     ///////////////
+
+// Create a capturer that exports an animated GIF
+// Notices you have to specify the path to the gif.worker.js 
+var capturer = new CCapture( { format: 'gif', workersPath:'js/', name: 'render', framerate: 80, quality:30} );
 
 
 //////////////     GENERAL FUNCTIONS    ///////////////
@@ -390,8 +399,34 @@ function exportPNG(){
 }
 
 //export the rotation of the building as a gif
+let RPS = 6;   //rotations per second
+let ROT_INT = (360*RPS)/1000  //rotation interval
+var rot_gif_int = 0;
 function exportGIF(){
+    //reset the rotation
+    ANGLE = 0;
+    rotateCam(ANGLE,CENTER_Y,RADIUS);
 
+    //Rotate the camera around the structure
+    rot_gif_int = setInterval(function(){
+        ANGLE = (ANGLE + ROT_INT) % 360;
+        
+        //rotate the camera
+        CAMERA.position.x = RADIUS * Math.cos( ANGLE * (Math.PI/180) );  
+        CAMERA.position.z = RADIUS * Math.sin( ANGLE * (Math.PI/180) ); 
+        CAMERA.lookAt(0,CENTER_Y,0);
+    },1)
+
+    capturer.start();
+
+    // set a timeout before saving the gif (1 second)
+    setTimeout(function(){
+        capturer.stop();
+        capturer.save();
+        clearInterval(rot_gif_int);
+        rot_gif_int = 0;
+        console.log("GIF saved!");
+    },1000);
 }
 
 
@@ -511,6 +546,8 @@ function init(){
 function main(){
     requestAnimationFrame( main );
     RENDERER.render( SCENE, CAMERA );
+    if(rot_gif_int != 0)
+        capturer.capture( RENDERER.domElement );
 }
 
 main();
