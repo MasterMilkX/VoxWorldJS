@@ -3,6 +3,7 @@ TODO
 [X] Import 3D arrays for structures as a npy or txt file
 [X] Allow importing both structures and texture presetting together as a single JSON file
 [X] Actually 3d render the objects lol
-[ ] Export to PNG + GIF
+[X] Export to PNG + GIF
 [X] Allow height changes
 [ ] Headless Node.JS version of the code
+[ ] 
