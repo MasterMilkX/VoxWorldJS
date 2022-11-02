@@ -193,7 +193,7 @@ function changeTexture(dd){
     var img = document.getElementById("tex_img_"+id);
     img.src = TEXTURE_DIR+"/"+dd.value+".png";
     TEXTURE_PNG[id] = loader.load(TEXTURE_DIR+"/"+dd.value+".png");
-    TEXTURE_MAT[id_num] = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[id_num],transparent: true});
+    TEXTURE_MAT[id] = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[id],transparent: true});
     CUR_TEXTURE_LIST[id] = dd.value;
     localStorage.tex_list = JSON.stringify(CUR_TEXTURE_LIST);
 }   

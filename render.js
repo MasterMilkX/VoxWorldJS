@@ -1,5 +1,10 @@
 // HEADLESS VERSION OF THE INTERACTIVE CODE THAT MAKES IMAGES AND GIFS OF PASSED JSON DATA
+// KIND OF HACKY - STRINGS TOGETHER THE STEPS OF THE FUNCTIONS (BECAUSE OF THE IMPORTING TEXTURES CAUSING ASYNC ISSUES)
+// Written by: Milk
+
 // Input: JSON data => { "structure": str (3d int array of the structure), "textures" : [str list] (texture names), ("id": int, "angle": int (0-359), "zoom": int, "height":int, "offset": [float list]) }
+
+
 
 //imports
 const fs = require('fs');
@@ -8,7 +13,9 @@ const GIFEncoder = require('gifencoder');
 const {createCanvas, loadImage} = require('./js/node-canvas-webgl');
 const { exit } = require('process');
 
-//parameters
+
+
+//parameters (move to a config file)
 var BG_COLOR = 0xfafafa;
 var CANV_WIDTH = 400;
 var CANV_HEIGHT = 300;
@@ -22,17 +29,23 @@ var RADIUS = 15;
 var ANGLE = 0;
 var CENTER_Y = 2;
 
-var RENDER_DELAY = 500;
-var EXPORT_DELAY = 100;
+var RENDER_DELAY = 50;   //how long to wait (ms) after attempting to render the structure onto the canvas 
+var EXPORT_DELAY = 50;   //how long to wait (ms) after exporting the image file before going to the next structure
 var RPS = 0.7;  //rotations per second for the model GIF output
 
-CUR_TEXTURE_LIST = []
-CUR_STRUCTURE = []
+var CUR_TEXTURE_LIST = []
+var CUR_STRUCTURE = []
 var DEFAULT_TEXTURE_LIST = ["air","stonebrick","dirt","planks_oak","sand","iron_bars","glass","iron_block","log_oak","wool_colored_red","stone_slab_side"];
 
 
 var OUTMODE = "PNG";
 var OUTPUT_DIR = `./output_${OUTMODE}/`;
+
+
+
+
+
+
 
 //////////////      THREE.JS SETUP     ///////////////
 
@@ -65,7 +78,8 @@ SCENE.add(directionalLight);
 let VOXEL = new THREE.BoxGeometry( 1, 1, 1 );
 
 
-///////////////    THREE.JS FUNCTIONS     ///////////////
+
+///////////////    THREE.JS + STRUCTURE FUNCTIONS     ///////////////
 
 
 //parse the JSON data for the structure
@@ -88,54 +102,35 @@ function setupStruct(full_data,id){
     }
 
     // //parse the texture json
-    // console.log("> GETTING TEXTURES...");
-    // // use new textures
-    // if(data.texture_set != undefined){
-    //     CUR_TEXTURE_LIST = data.texture_set;
-    //     importTextureID(full_data,id,0);
-    // }
-    // //use default textures if none are passed and not already loaded
-    // else if(CUR_TEXTURE_LIST.length == 0){
-    //     console.log("> WARNING: No texture set provided, using default");
-    //     CUR_TEXTURE_LIST = DEFAULT_TEXTURE_LIST;
-    //     importTextureID(full_data,id,0);
-    // }
-    // //all textures already loaded
-    // else{
-    //     console.log("> Using previously loaded textures");
-    //     make3dStructure(full_data,id,CUR_STRUCTURE);
-    // }
+    console.log("> GETTING TEXTURES...");
+    // use new textures
+    if(data.texture_set != undefined){
+        CUR_TEXTURE_LIST = data.texture_set;
+        importTextureID(full_data,id,0);
+    }
+    //use default textures if none are passed and not already loaded
+    else if(CUR_TEXTURE_LIST.length == 0){
+        console.log("> WARNING: No texture set provided, using default");
+        CUR_TEXTURE_LIST = DEFAULT_TEXTURE_LIST;
+        importTextureID(full_data,id,0);
+    }
+    //all textures already loaded
+    else{
+        console.log("> Using previously loaded textures");
+        make3dStructure(full_data,id,CUR_STRUCTURE);
+    }
 
 
     //make it just blue cubes
-    CUR_TEXTURE_LIST = ["air"];
-    TEXT_MAT = [];
-    for(let i = 0; i < 16; i++){
-        CUR_TEXTURE_LIST.push("blue");
-        TEXT_MAT.push(new THREE.MeshBasicMaterial({color: 0x0000ff}));
-    }
-    make3dStructure(full_data,id,CUR_STRUCTURE);
+    // CUR_TEXTURE_LIST = ["air"];
+    // TEXT_MAT = [];
+    // for(let i = 0; i < 16; i++){
+    //     CUR_TEXTURE_LIST.push("blue");
+    //     TEXT_MAT.push(new THREE.MeshBasicMaterial({color: 0x0000ff}));
+    // }
+    // make3dStructure(full_data,id,CUR_STRUCTURE);
     
 }
-
-//import the textures and materials based on the texture list
-// function importAllTextures(){
-//     TEXT_LOAD = new Array(CUR_TEXTURE_LIST.length).fill(false);  //thanks copilot!
-//     for(var i = 0; i < CUR_TEXTURE_LIST.length; i++){
-//         // TEXTURE_PNG[i] = loader.load(TEXTURE_DIR + "/" + CUR_TEXTURE_LIST[i] + ".png");
-//         // TEXTURE_PNG[i].onLoad = function(){TEXT_LOAD[i] = true;}
-
-//         //load the texture as raw data 
-//         let filename = TEXTURE_DIR + CUR_TEXTURE_LIST[i] + ".png"
-//         loadImage(filename).then((image) => {
-//             console.log("> Loaded texture: " + filename);
-//             TEXTURE_PNG[i] = new THREE.DataTexture( image, image.width, image.height );
-//             TEXT_LOAD[i] = true;
-//             TEXT_MAT[i] = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[i] ,transparent: true});
-//         })
-        
-//     }
-// }
 
 //import a particular texture image from the texture list then render
 function importTextureID(full_data,struct_id,id){
@@ -143,9 +138,18 @@ function importTextureID(full_data,struct_id,id){
     let filename = TEXTURE_DIR + CUR_TEXTURE_LIST[id] + ".png"
     loadImage(filename).then((image) => {
         console.log("> Loaded texture #" + id + ": " + filename);
-        TEXTURE_PNG[id] = new THREE.DataTexture( image, image.width, image.height );
+
+        //fake mini canvas for the imported images
+        const img_canvas = createCanvas(image.width, image.height)
+        const itx = img_canvas.getContext('2d')
+
+        //draw onto mini canvas
+        itx.drawImage(image, 0, 0, img_canvas.width, img_canvas.height);
+
+        //add to the scene
+        TEXTURE_PNG[id] = new THREE.CanvasTexture(img_canvas);
+        TEXT_MAT[id] = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[id]});
         TEXT_LOAD[id] = true;
-        TEXT_MAT[id] = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[id] ,transparent: true});
 
         //finished loading textures, so continue
         if(id == CUR_TEXTURE_LIST.length -1){
@@ -174,6 +178,7 @@ function make3dStructure(full_data,struct_id,arr3d,offset=[0,0,0]){
         SCENE.remove(SCENE.children[0]); 
     }
 
+    //import offset if specified
     if(full_data[struct_id].offset != undefined){
         offset = full_data[struct_id].offset;
     }
@@ -243,6 +248,7 @@ function resetCamera(){
     rotateCam(ANGLE,CENTER_Y,RADIUS)
 }
 
+//custom camera position (for debugging)
 function customCam(){
     ANGLE = 245;
     RADIUS = 15;
@@ -264,26 +270,7 @@ function rotateCam(angle,height,radius){
 //export the canvas as a png
 var load_tries = 0;
 function exportPNG(full_data,struct_id,filename){
-    //set the canvas to the size of the structure
-    // resetCamera();
-
-    // //check if all textures are loaded, and repeat if not
-    // if(load_tries < 10 && !TEXT_LOAD.every((val) => val == true)){
-    //     console.log("> WARNING: Not all textures are loaded, trying again in 1 second");
-    //     load_tries++;
-    //     setTimeout(function(){exportPNG(filename);},1000);
-    //     return;
-    // }
-    // //too many tries to load
-    // if(load_tries >= 10){
-    //     console.log("> ERROR: Not all textures are loaded, cannot export");
-    //     return;
-    // }
-
-    
-
-    
-
+    //load the image from the renderer canvas
     let im_data = RENDERER.domElement.toDataURL("image/png");
 
     // strip off the data: url prefix to get just the base64-encoded bytes
@@ -295,7 +282,6 @@ function exportPNG(full_data,struct_id,filename){
 
     console.log("> Exported PNG to " + filename);
     console.log("")
-    
 
     //FINISHED! do the next structure
     setTimeout(function(){
@@ -314,12 +300,11 @@ function exportPNG(full_data,struct_id,filename){
 
 ///////////////    MAIN FUNCTION    ///////////////
 
-// main execution function
-function main(){
+// starting execution function
+function start(){
 
-    ///// IMPORT THE JSON DATA /////
+    ///// READ THE ARGUMENTS FROM COMMAND LINE /////
 
-    //read arguments from command line
     const args = process.argv.slice(2);
 
     //no json file provided - so exit
@@ -343,7 +328,10 @@ function main(){
         fs.mkdirSync(OUTPUT_DIR);
     }
 
-    //parse the JSON data to the texture list and structure
+
+
+    /////  VALIDATE THE JSON FILE  /////
+
     var jfile = fs.readFileSync(args[0], 'utf8')
     try{
         var data = JSON.parse(jfile);
@@ -352,42 +340,16 @@ function main(){
         process.exit(1);
     }
 
+
+
+
     ///// RENDER EACH STRUCTURE /////
+    
     let STRUCTURE_LIST = data.structure_set;
 
     //start with #0 then iterate through each
     let struct_id = 0;
     setupStruct(STRUCTURE_LIST,struct_id);
-
-
-    // for(let s=0;s<STRUCTURE_LIST.length;s++){
-    //     console.log(`----- STRUCTURE ${s} -----`)
-
-    //     //parse the structure data
-    //     if(!setupStruct(STRUCTURE_LIST[s])){
-    //         console.log(`> ERROR: Invalid structure data for structure ${s}! Skipping...`);
-    //         continue
-    //     }
-
-    //     //wait until everything is loaded
-    //     while(!TEXT_LOAD.every((val) => val == true)){
-    //         console.log("> WARNING: Not all textures are loaded, trying again in 1 second");
-    //         console.log(TEXT_LOAD);
-    //         await sleep(1000);
-    //     }
-
-    //     //render the structure (to a secret canvas)
-    //     console.log(`Rendering and exporting PNG.`);
-    //     if(outMode == "PNG"){
-    //         let filename = (STRUCTURE_LIST[s].id ? `${STRUCTURE_LIST[s].id}` : `structure_${s}`);
-    //         exportPNG(`${OUTPUT_DIR}/${filename}.png`);
-    //     }
-    //     console.log("")
-    // }
-    
-    // console.log(TEXT_LOAD);
-    // console.log(TEXTURE_PNG)
-
 }
 
-main();
+start();
