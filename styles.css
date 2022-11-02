@@ -1,6 +1,6 @@
 /* import custom fonts */
-@font-face {font-family: Minecraft; src: url('Minecraft.ttf');}
-@font-face {font-family: Compact; src: url('compact.ttf');}
+@font-face {font-family: Minecraft; src: url('fonts/Minecraft.ttf');}
+@font-face {font-family: Compact; src: url('fonts/compact.ttf');}
 
 /* general elements */
 body{

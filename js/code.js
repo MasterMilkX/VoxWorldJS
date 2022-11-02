@@ -10,7 +10,12 @@ var TEXTURE_DIR = "textures/";
 var DEFAULT_TEXTURE_LIST = ["air","stonebrick","dirt","planks_oak","sand","iron_bars","glass","iron_block","log_oak","wool_colored_red","stone_slab_side"];
 var ALL_TEXTURES = [];
 var CUR_TEXTURE_LIST = [];  
-var TEXTURE_PNG = [];
+var TEXTURE_PNG = [];  //texture images
+var TEXTURE_MAT = [];  //texture materials
+var TEXTURE_MAT2 = [];
+for(let i=0;i<11;i++){
+    TEXTURE_MAT2[i] = new THREE.MeshBasicMaterial({color: 0x0000ff});
+}
 
 var CUR_STRUCTURE = [];
 
@@ -46,6 +51,9 @@ SCENE.add(ambientLight);
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
 directionalLight.position.set(10, 20, 0); // x, y, z
 SCENE.add(directionalLight);
+
+//set the voxel geometry
+var VOXEL = new THREE.BoxBufferGeometry( 1, 1, 1 );
 
 
 
@@ -166,9 +174,11 @@ function makeTextureRow(id_num){
     if(id_num < CUR_TEXTURE_LIST.length){
         img.src = TEXTURE_DIR + "/" + CUR_TEXTURE_LIST[id_num] + ".png";
         TEXTURE_PNG[id_num] = loader.load(TEXTURE_DIR + "/" + CUR_TEXTURE_LIST[id_num] + ".png");
+        TEXTURE_MAT[id_num] = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[id_num],transparent: true});
     }else{
         img.src = TEXTURE_DIR + "/air.png";
         TEXTURE_PNG[id_num] = loader.load(TEXTURE_DIR + "/air.png");
+        TEXTURE_MAT[id_num] = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[id_num],transparent: true});
     }
 
     imgCol.appendChild(img);
@@ -183,6 +193,7 @@ function changeTexture(dd){
     var img = document.getElementById("tex_img_"+id);
     img.src = TEXTURE_DIR+"/"+dd.value+".png";
     TEXTURE_PNG[id] = loader.load(TEXTURE_DIR+"/"+dd.value+".png");
+    TEXTURE_MAT[id_num] = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[id_num],transparent: true});
     CUR_TEXTURE_LIST[id] = dd.value;
     localStorage.tex_list = JSON.stringify(CUR_TEXTURE_LIST);
 }   
@@ -345,9 +356,7 @@ function make3dStructure(arr3d,offset=[0,0,0]){
         for(let j = 0; j < arr3d[i].length; j++){
             for(let k = 0; k < arr3d[i][j].length; k++){
                 if(CUR_TEXTURE_LIST[arr3d[i][j][k]] != "air"){
-                    let geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-                    let  material = new THREE.MeshBasicMaterial({map: TEXTURE_PNG[arr3d[i][j][k]] ,transparent: true});
-                    let cube = new THREE.Mesh( geometry, material );
+                    let cube = new THREE.Mesh( VOXEL, TEXTURE_MAT[arr3d[i][j][k]] );
                     cube.position.set(i+off[0]-structCen[0],structDim[1]-j+off[1],k+off[2]-structCen[2]);
                     structObj.add(cube);
                 }

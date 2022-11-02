@@ -1,5 +1,14 @@
 #general ignores
 scripts/update_ghpages.sh
+output_PNG/
+output_GIF/
+
+
+
+
+
+
+
 
 # nodejs / npm ignores
 # Logs
