@@ -3,10 +3,18 @@
 
 //imports
 var fs = require('fs');
-var THREE = require('./js/three');
-// var Canvas = require('canvas');
+global.THREE = require('three');
+const { createCanvas } = require('canvas')
 
+//parameters
 var TEXTURE_DIR = "./textures/";
+var IMG_OUTPUT = "./offline_json_sets/imgs/"
+var GIF_OUTPUT = "./offline_json_sets/gifs/"
+
+var RADIUS = 15;
+var ANGLE = 0;
+var CENTER_Y = 2;
+
 CUR_TEXTURE_LIST = []
 CUR_STRUCTURE = []
 var DEFAULT_TEXTURE_LIST = ["air","stonebrick","dirt","planks_oak","sand","iron_bars","glass","iron_block","log_oak","wool_colored_red","stone_slab_side"];
@@ -14,29 +22,30 @@ var DEFAULT_TEXTURE_LIST = ["air","stonebrick","dirt","planks_oak","sand","iron_
 
 //////////////      THREE.JS SETUP     ///////////////
 
-// var rendCanvas = Canvas.IMAGE;
+var rendCanvas = createCanvas(400,300)
 
-// //set up the canvas
+//set up the canvas
 // const RENDERER = new THREE.WebGLRenderer({canvas: rendCanvas, antialias: false, preserveDrawingBuffer: true });
-// RENDERER.setSize(400, 300);
-// // RENDERER.domElement.id = "renderCanvas";
-// // document.getElementById("render").appendChild(RENDERER.domElement);
+const RENDERER = new THREE.CanvasRenderer({canvas: rendCanvas, antialias: false, preserveDrawingBuffer: true });
+RENDERER.setSize(400, 300);
+// RENDERER.domElement.id = "renderCanvas";
+// document.getElementById("render").appendChild(RENDERER.domElement);
 
-// //setup scene and camera
-// const SCENE = new THREE.Scene();
-// SCENE.background = new THREE.Color( BG_COLOR ).convertSRGBToLinear();
-// const CAMERA = new THREE.PerspectiveCamera( 75, rendCanvas.clientWidth / rendCanvas.clientHeight, 0.1, 1000);
+//setup scene and camera
+const SCENE = new THREE.Scene();
+SCENE.background = new THREE.Color( BG_COLOR ).convertSRGBToLinear();
+const CAMERA = new THREE.PerspectiveCamera( 75, rendCanvas.clientWidth / rendCanvas.clientHeight, 0.1, 1000);
 
-// //load a texture loader
-// const loader = new THREE.TextureLoader();
+//load a texture loader
+const loader = new THREE.TextureLoader();
 
-// //add a light
-// const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
-// SCENE.add(ambientLight);
+//add a light
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+SCENE.add(ambientLight);
 
-// const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-// directionalLight.position.set(10, 20, 0); // x, y, z
-// SCENE.add(directionalLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+directionalLight.position.set(10, 20, 0); // x, y, z
+SCENE.add(directionalLight);
 
 
 ///////////////    THREE.JS FUNCTIONS     ///////////////
@@ -117,8 +126,6 @@ function make3dStructure(arr3d,offset=[0,0,0]){
 
     //move the camera up some to account for new height
     CENTER_Y = Math.max(2,structCen[1]);
-    document.getElementById("heightView").value = CENTER_Y;
-    document.getElementById("heightViewVal").value = CENTER_Y;
     
     // resetCamera();
     rotateCam(ANGLE,CENTER_Y,RADIUS)
@@ -127,6 +134,77 @@ function make3dStructure(arr3d,offset=[0,0,0]){
     SCENE.add(structObj);
 
 }
+
+//reset the camera's angle and position
+function resetCamera(){
+    ANGLE = 180;
+    RADIUS = 10;
+
+    //update the inputs
+    updateSliders();
+
+    rotateCam(ANGLE,CENTER_Y,RADIUS)
+}
+
+//rotate the camera around the structure
+function rotateCam(angle,height,radius){
+    CAMERA.position.y = height;
+    CAMERA.position.x = radius * Math.cos( angle * (Math.PI/180) );  
+    CAMERA.position.z = radius * Math.sin( angle * (Math.PI/180) ); 
+    CAMERA.lookAt(0,height,0);
+}
+
+/////////////   EXPORTING FUNCTIONS   //////////////
+
+
+//export the canvas as a png
+function exportPNG(filename){
+    //render the scene
+    RENDERER.render(SCENE, CAMERA);
+
+    let im_data = RENDERER.domElement.toDataURL("image/png");
+
+    // strip off the data: url prefix to get just the base64-encoded bytes
+    const data = im_data.replace(/^data:image\/\w+;base64,/, "");
+
+    // write to a file
+    const buf = Buffer.from(data, "base64");
+    fs.writeFile(filename, buf);
+    
+}
+
+//export the rotation of the building as a gif
+// let RPS = 6;   //rotations per second
+// let ROT_INT = (360*RPS)/1000  //rotation interval
+// var rot_gif_int = 0;
+// function exportGIF(){
+//     //reset the rotation
+//     ANGLE = 0;
+//     rotateCam(ANGLE,CENTER_Y,RADIUS);
+
+//     //Rotate the camera around the structure
+//     rot_gif_int = setInterval(function(){
+//         ANGLE = (ANGLE + ROT_INT) % 360;
+        
+//         //rotate the camera
+//         CAMERA.position.x = RADIUS * Math.cos( ANGLE * (Math.PI/180) );  
+//         CAMERA.position.z = RADIUS * Math.sin( ANGLE * (Math.PI/180) ); 
+//         CAMERA.lookAt(0,CENTER_Y,0);
+//     },1)
+
+//     capturer.start();
+
+//     // set a timeout before saving the gif (1 second)
+//     setTimeout(function(){
+//         capturer.stop();
+//         capturer.save();
+//         clearInterval(rot_gif_int);
+//         rot_gif_int = 0;
+//         console.log("GIF saved!");
+//     },1000);
+// }
+
+
 
 ///////////////    MAIN FUNCTION    ///////////////
 
@@ -164,7 +242,7 @@ function main(){
         }
 
         //render the structure (to a secret canvas)
-
+        // exportPNG(`${IMG_OUTPUT}struct_${s}.png`);
 
     }
     

@@ -5,5 +5,5 @@ TODO
 [X] Actually 3d render the objects lol
 [X] Export to PNG + GIF
 [X] Allow height changes
-[ ] Headless Node.JS version of the code
+[ ] Headless Node.JS version of the code -> (look at https://npm.io/package/node-canvas-webgl and headless-gl)
 [ ] Make the README / documentation

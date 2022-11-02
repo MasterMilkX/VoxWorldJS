@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/MasterMilkX/VoxWorldJS/issues"
   },
-  "homepage": "https://github.com/MasterMilkX/VoxWorldJS#readme"
+  "homepage": "https://github.com/MasterMilkX/VoxWorldJS#readme",
+  "dependencies": {
+    "canvas": "^2.10.2",
+    "three": "^0.146.0",
+    "three-canvas-renderer": "^2.0.0"
+  }
 }
