@@ -1,0 +1,19 @@
+{
+  "name": "voxworldjs",
+  "version": "1.0.0",
+  "description": "Renders 3d integer arrays using textured voxels",
+  "main": "render.js",
+  "scripts": {
+    "render": "node js/render.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MasterMilkX/VoxWorldJS.git"
+  },
+  "author": "Milk Charity",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MasterMilkX/VoxWorldJS/issues"
+  },
+  "homepage": "https://github.com/MasterMilkX/VoxWorldJS#readme"
+}
