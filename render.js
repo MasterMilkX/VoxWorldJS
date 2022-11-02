@@ -2,9 +2,10 @@
 // Input: JSON data => { "structure": str (3d int array of the structure), "textures" : [str list] (texture names) }
 
 //imports
-var fs = require('fs');
-global.THREE = require('three');
-const { createCanvas } = require('canvas')
+const fs = require('fs');
+const THREE = require('three');
+const GIFEncoder = require('gifencoder');
+const {createCanvas} = require('./js/node-canvas-webgl');
 
 //parameters
 var TEXTURE_DIR = "./textures/";
@@ -22,11 +23,10 @@ var DEFAULT_TEXTURE_LIST = ["air","stonebrick","dirt","planks_oak","sand","iron_
 
 //////////////      THREE.JS SETUP     ///////////////
 
-var rendCanvas = createCanvas(400,300)
+const rendCanvas = createCanvas(width, height);
 
 //set up the canvas
-// const RENDERER = new THREE.WebGLRenderer({canvas: rendCanvas, antialias: false, preserveDrawingBuffer: true });
-const RENDERER = new THREE.CanvasRenderer({canvas: rendCanvas, antialias: false, preserveDrawingBuffer: true });
+const RENDERER = new THREE.WebGLRenderer({canvas: rendCanvas, antialias: false, preserveDrawingBuffer: true });
 RENDERER.setSize(400, 300);
 // RENDERER.domElement.id = "renderCanvas";
 // document.getElementById("render").appendChild(RENDERER.domElement);

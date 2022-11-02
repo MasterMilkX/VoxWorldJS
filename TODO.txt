@@ -6,4 +6,8 @@ TODO
 [X] Export to PNG + GIF
 [X] Allow height changes
 [ ] Headless Node.JS version of the code -> (look at https://npm.io/package/node-canvas-webgl and headless-gl)
+    - if node-canvas errors out do this 
+    1. goto node-modules/canvas/
+    2. run `npm install --build-from-source`
+    - try also `brew install pkg-config cairo pango libpng jpeg giflib librsvg`
 [ ] Make the README / documentation
