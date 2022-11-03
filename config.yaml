@@ -1,0 +1,28 @@
+# PARAMETERS USED IN THE RENDER.JS SYSTEM
+# Note: removing any values will make the script use the default values
+# Written by Milk - Date: 11/3/22
+
+# Canvas settings
+BG_COLOR : "0xfafafa"           # background color for the render canvas that the structure is rendered on
+CANV_WIDTH : 400              # width of the render canvas
+CANV_HEIGHT : 300             # height of the render canvas
+
+# Texture settings
+TEXTURE_DIR : "./textures"    # directory to import the textures from (as specified in the input JSON file by name)
+DEFAULT_TEXTURES : ["air","stonebrick","dirt","planks_oak","sand","iron_bars","glass","iron_block","log_oak","wool_colored_red","stone_slab_side"]    # default texture names to use in case no textures are given for the first structure
+
+# Default camera settings
+RADIUS : 15                   # how far away to be from the structure and the radius to rotate around 
+ANGLE : 0                     # starting angle to view the structure from (GIF completes one revolution starting at this angle )
+CENTER_Y : 2                  # y-value to focus the camera on (use "CENTER" to make it center with the structure)
+
+# PNG/GIF settings
+RENDER_DELAY : 50             # how long to wait (ms) after attempting to render the structure onto the canvas 
+EXPORT_DELAY : 10             # how long to wait (ms) after exporting the image file before going to the next structure
+GIF_FRAMES : 30               # (#) of frames to use for the GIF to complete one revolution (more frames = slower rotation)
+FRAME_DELAY : 1               # how fast to capture the frames (does not affect rotation speed of the GIF)
+CLOCKWISE_ROT : true          # whether to spin the structure clockwise
+
+# Output settings
+OUTMODE : "PNG"               # default mode to export the structures to
+OUTPUT_DIR : "./"             # parent directory to hold the exported media (saved indivudually as 'OUTPUT_DIR/output_[PNG|GIF]/[id|struct #].[png|gif]')

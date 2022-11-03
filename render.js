@@ -5,17 +5,17 @@
 // Input: JSON data => { "structure": str (3d int array of the structure), "textures" : [str list] (texture names), ("id": int, "angle": int (0-359), "distance": int, "height":double, "offset": [float list]) }
 
 
-
 //imports
 const fs = require('fs');
 const THREE = require('three');
 const GIFEncoder = require('gifencoder');
 const {createCanvas, loadImage} = require('./js/node-canvas-webgl');
 const { exit } = require('process');
+const yaml = require('js-yaml');
 
 
 
-//parameters (move to a config file)
+//default parameters (can be changed in the config.yaml file and overwritten)
 var BG_COLOR = 0xfafafa;
 var CANV_WIDTH = 400;
 var CANV_HEIGHT = 300;
@@ -28,6 +28,10 @@ var TEXT_LOAD = [];
 var RADIUS = 15;
 var ANGLE = 0;
 var CENTER_Y = 2;
+var DEF_ANGLE = 180;
+var DEF_RADIUS = 15;
+var DEF_CENTER_Y = 2;
+var use_struct_center = false;
 
 var RENDER_DELAY = 50;   //how long to wait (ms) after attempting to render the structure onto the canvas 
 var EXPORT_DELAY = 10;   //how long to wait (ms) after exporting the image file before going to the next structure
@@ -42,11 +46,46 @@ var DEFAULT_TEXTURE_LIST = ["air","stonebrick","dirt","planks_oak","sand","iron_
 
 var OUTMODE = "PNG";
 var OUTPUT_DIR = `./output_${OUTMODE}/`;
+var PARENT_OUT_DIR = ".";
 
 
+// import the config file and overwrite the default parameters if they exist
+let configCont = fs.readFileSync('./config.yaml', 'utf8');
+let config = yaml.load(configCont);
 
-
-
+//overwrite the default parameters if they exist in the config file
+function parseConfig(){
+    if(config["BG_COLOR"] != undefined)
+        BG_COLOR = config["BG_COLOR"];
+    if(config["CANV_WIDTH"] != undefined)
+        CANV_WIDTH = config["CANV_WIDTH"];
+    if(config["CANV_HEIGHT"] != undefined)
+        CANV_HEIGHT = config["CANV_HEIGHT"];
+    if(config["TEXTURE_DIR"] != undefined)
+        TEXTURE_DIR = config["TEXTURE_DIR"];
+    if(config["DEFAULT_TEXTURES"] != undefined)
+        DEFAULT_TEXTURE_LIST = config["DEFAULT_TEXTURES"];
+    if(config["RADIUS"] != undefined)
+        DEF_RADIUS = config["RADIUS"];
+    if(config["ANGLE"] != undefined)
+        DEF_ANGLE = config["ANGLE"];
+    if(config["CENTER_Y"] != undefined)
+        DEF_CENTER_Y = config["CENTER_Y"];
+    if(config["RENDER_DELAY"] != undefined)
+        RENDER_DELAY = config["RENDER_DELAY"];
+    if(config["EXPORT_DELAY"] != undefined)
+        EXPORT_DELAY = config["EXPORT_DELAY"];
+    if(config["GIF_FRAMES"] != undefined)
+        GIF_FRAMES = config["GIF_FRAMES"];
+    if(config["FRAME_DELAY"] != undefined)
+        FRAME_DELAY = config["FRAME_DELAY"];
+    if(config["CLOCKWISE"] != undefined)
+        CLOCKWISE = config["CLOCKWISE"];
+    if(config["OUTMODE"] != undefined)
+        OUTMODE = config["OUTMODE"];
+    if(config["OUTPUT_DIR"] != undefined)
+       PARENT_OUT_DIR = config["OUTPUT_DIR"];
+}
 
 
 //////////////      THREE.JS SETUP     ///////////////
@@ -130,15 +169,6 @@ function setupStruct(full_data,id){
         make3dStructure(full_data,id,CUR_STRUCTURE);
     }
 
-
-    //make it just blue cubes
-    // CUR_TEXTURE_LIST = ["air"];
-    // TEXT_MAT = [];
-    // for(let i = 0; i < 16; i++){
-    //     CUR_TEXTURE_LIST.push("blue");
-    //     TEXT_MAT.push(new THREE.MeshBasicMaterial({color: 0x0000ff}));
-    // }
-    // make3dStructure(full_data,id,CUR_STRUCTURE);
     
 }
 
@@ -190,7 +220,7 @@ function make3dStructure(full_data,struct_id,arr3d,offset=[0,0,0]){
 
     //import offset if specified
     if(full_data[struct_id].offset != undefined){
-        offset = full_data[struct_id].offset;
+        offset = JSON.parse(full_data[struct_id].offset);
     }
 
     //default offset
@@ -227,9 +257,19 @@ function make3dStructure(full_data,struct_id,arr3d,offset=[0,0,0]){
         RADIUS = parseInt(full_data[struct_id].distance);
     }
     if(full_data[struct_id].height != undefined){
-        CENTER_Y = parseFloat(full_data[struct_id].height);
+        //center it on the structure's height
+        if(String(full_data[struct_id].height).toLowerCase() == "center")
+            use_struct_center = true;
+        //or use the specified height
+        else{
+            CENTER_Y = parseFloat(full_data[struct_id].height);
+            use_struct_center = false;
+        }
     }
+    if(use_struct_center)
+        CENTER_Y = Math.max(2,structCen[1]);
 
+    //move the camera into position
     console.log(`> Camera position set to: angle=${ANGLE}, zoom=${RADIUS}, height=${CENTER_Y}`);
     rotateCam(ANGLE,CENTER_Y,RADIUS);
 
@@ -255,18 +295,11 @@ function make3dStructure(full_data,struct_id,arr3d,offset=[0,0,0]){
 
 //reset the camera's angle and position
 function resetCamera(){
-    ANGLE = 180;
-    RADIUS = 10;
+    ANGLE = DEF_ANGLE;
+    RADIUS = DEF_RADIUS;
+    CENTER_Y = DEF_CENTER_Y;
 
     rotateCam(ANGLE,CENTER_Y,RADIUS)
-}
-
-//custom camera position (for debugging)
-function customCam(){
-    ANGLE = 245;
-    RADIUS = 15;
-
-    rotateCam(ANGLE,6,RADIUS)
 }
 
 //rotate the camera around the structure
@@ -326,8 +359,7 @@ function exportGIF(full_data,struct_id,filename){
     gifUpdate(full_data,struct_id,filename,GIF_FRAMES);
 }
 
-//rotates the structure 
-
+//rotates the structure and saves a frame
 function gifUpdate(full_data,struct_id,filename,maxFrames) {
     //rotate the camera
     if(!CLOCKWISE)
@@ -354,12 +386,13 @@ function gifUpdate(full_data,struct_id,filename,maxFrames) {
     }
     //finish and goto next structure
     else{
+        //save the encoded frames and make a new encoder (doesn't make new gifs otherwise)
         encoder.finish();
         encoder = null;
         encoder = new GIFEncoder(CANV_WIDTH, CANV_HEIGHT);
         console.log("> Exported GIF to " + filename);
 
-        //FINISHED! do the next structure
+        //FINISHED! do the next structure or exit
         setTimeout(function(){
             if(struct_id < full_data.length -1){
                 setupStruct(full_data,struct_id+1);
@@ -395,7 +428,7 @@ function start(){
     }
 
     //get output directory for the preview files
-    OUTPUT_DIR = `./output_${OUTMODE}`;
+    OUTPUT_DIR = `${PARENT_OUT_DIR}/output_${OUTMODE}`;
     if(args.length > 2){
         OUTPUT_DIR = args[2];
     }
