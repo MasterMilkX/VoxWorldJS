@@ -61,6 +61,7 @@ function update(maxFrames = 60) {
   cube.rotation.y += 0.05;
   renderer.render(scene, camera);
   if(idx > 0) {
+    console.log(canvas.__ctx__);
     encoder.addFrame(canvas.__ctx__);
     // console.log(`add frame ${idx}`);
   }

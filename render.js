@@ -351,6 +351,8 @@ function gifUpdate(full_data,struct_id,filename,maxFrames) {
     //finish and goto next structure
     else{
         encoder.finish();
+        encoder = null;
+        encoder = new GIFEncoder(CANV_WIDTH, CANV_HEIGHT);
         console.log("> Exported GIF to " + filename);
 
         //FINISHED! do the next structure

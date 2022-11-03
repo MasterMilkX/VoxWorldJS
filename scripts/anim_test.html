@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Animation test</title>
+        <style>
+            #container{
+                width: 100%;
+                height: 100%;
+                display: inline-block;
+            }
+            #game{
+                margin: 20px auto 0 auto;
+                width: 100px;
+                height: 100px;
+                background-color: #dedede;
+                display:block
+            }   
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <canvas id="game">Animation goes here</canvas>
+        </div>
+        
+
+        <!-- canvas scripting -->
+        <script>
+            let canvas = document.getElementById("game");
+            let ctx = canvas.getContext("2d");
+            canvas.width = 100;
+            canvas.height = 100;
+
+            let sprite = {x:0,y:0,ox:canvas.width/2,oy:canvas.height/2+10,s:10,r:20};
+            
+            let t = 0;
+            setInterval(function(){
+                t++;
+                t %= 1000;
+                //move sprite in a circle
+                sprite.x = sprite.ox + sprite.r*Math.cos(t/10) - sprite.s/2;
+                sprite.y = sprite.oy + sprite.r*Math.sin(t/10) - sprite.s/2;
+            },1000/60);
+            function animate(){
+                requestAnimationFrame(animate);
+
+                //render
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                ctx.fillStyle = "#f00";
+                ctx.fillRect(sprite.x,sprite.y,sprite.s,sprite.s);
+
+                ctx.fillStyle = "#000";
+                ctx.fillText("X",sprite.ox,sprite.oy);
+                ctx.textAlign = "center";
+                ctx.fillText("Time: " + t, canvas.width/2,20)
+                
+            }
+            animate();
+        </script>
+    </body>
+</html>
