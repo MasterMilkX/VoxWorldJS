@@ -20,9 +20,6 @@
     "canvas": "^2.10.2",
     "gifencoder": "^2.0.1",
     "gl": "^6.0.1",
-    "jimp": "^0.16.2",
-    "three": "^0.146.0",
-    "three-canvas-renderer": "^2.0.0",
-    "three-software-renderer": "^1.2.0"
+    "three": "^0.146.0"
   }
 }

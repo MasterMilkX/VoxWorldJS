@@ -25,8 +25,8 @@ var filename = "test_img.png"
 const buf = Buffer.from(data, "base64");
 fs.writeFileSync(filename, buf);
 
-// Draw amongus
-// loadImage('amongus.png').then((image) => {
+// Draw a bookshelf from the textures
+// loadImage('./textures/bookshelf.png').then((image) => {
 //   ctx.drawImage(image, 50, 0, 70, 70)
 
 // //   console.log('<img src="' + canvas.toDataURL() + '" />')

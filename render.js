@@ -30,8 +30,10 @@ var ANGLE = 0;
 var CENTER_Y = 2;
 
 var RENDER_DELAY = 50;   //how long to wait (ms) after attempting to render the structure onto the canvas 
-var EXPORT_DELAY = 50;   //how long to wait (ms) after exporting the image file before going to the next structure
-var RPS = 0.7;  //rotations per second for the model GIF output
+var EXPORT_DELAY = 10;   //how long to wait (ms) after exporting the image file before going to the next structure
+var GIF_FRAMES = 60;
+var FRAME_DELAY = 10;
+var CLOCKWISE = false;
 
 var CUR_TEXTURE_LIST = []
 var CUR_STRUCTURE = []
@@ -76,6 +78,11 @@ SCENE.add(directionalLight);
 
 //set cube geometry to use as voxels
 let VOXEL = new THREE.BoxGeometry( 1, 1, 1 );
+
+
+//////////////   OTHER SETUP  ///////////////
+
+var encoder = new GIFEncoder(CANV_WIDTH, CANV_HEIGHT);
 
 
 
@@ -234,6 +241,8 @@ function make3dStructure(full_data,struct_id,arr3d,offset=[0,0,0]){
     setTimeout(function(){
         if(OUTMODE == "PNG"){
             exportPNG(full_data,struct_id,`${OUTPUT_DIR}/${filename}.png`);
+        }else if(OUTMODE == "GIF"){
+            exportGIF(full_data,struct_id,`${OUTPUT_DIR}/${filename}.gif`);
         }
     },RENDER_DELAY);
 
@@ -268,7 +277,6 @@ function rotateCam(angle,height,radius){
 
 
 //export the canvas as a png
-var load_tries = 0;
 function exportPNG(full_data,struct_id,filename){
     //load the image from the renderer canvas
     let im_data = RENDERER.domElement.toDataURL("image/png");
@@ -295,7 +303,68 @@ function exportPNG(full_data,struct_id,filename){
     },EXPORT_DELAY);
 }
 
+//export the canvas as gif with rotating the structure
+var idx = 0;
+function exportGIF(full_data,struct_id,filename){
+    idx = 0;
+    //setup gif
+    encoder.createReadStream().pipe(fs.createWriteStream(filename));
 
+
+    //start recording
+    encoder.start();
+    encoder.setRepeat(0); // 0 for repeat, -1 for no-repeat
+    encoder.setDelay(FRAME_DELAY); // frame delay in ms
+    encoder.setQuality(10); // image quality. 10 is default.
+
+    //rotate and save frames
+    console.log("> Making " + GIF_FRAMES + " gif frames...");
+    gifUpdate(full_data,struct_id,filename,GIF_FRAMES);
+}
+
+//rotates the structure 
+
+function gifUpdate(full_data,struct_id,filename,maxFrames) {
+    //rotate the camera
+    if(!CLOCKWISE)
+        ANGLE += Math.floor(360/maxFrames);
+    else
+        ANGLE -= Math.floor(360/maxFrames);
+    ANGLE %= 360;  
+    // console.log(`Angle: ${ANGLE}`);
+    rotateCam(ANGLE,CENTER_Y,RADIUS);
+    RENDERER.render( SCENE, CAMERA );
+
+
+    //iterate the frame counter
+    if(idx > 0) {
+        encoder.addFrame(rendCanvas.__ctx__);
+        // encoder.addFrame(RENDERER.domElement.toDataURL("image/png"))
+      // console.log(`add frame ${idx}`);
+    }
+    idx++;
+
+    //goto next frame
+    if(idx < maxFrames) {
+        setTimeout(function(){gifUpdate(full_data,struct_id,filename,maxFrames)}, FRAME_DELAY);
+    }
+    //finish and goto next structure
+    else{
+        encoder.finish();
+        console.log("> Exported GIF to " + filename);
+
+        //FINISHED! do the next structure
+        setTimeout(function(){
+            if(struct_id < full_data.length -1){
+                setupStruct(full_data,struct_id+1);
+            }else{
+                console.log("-------------------------------------------")
+                console.log("> Finished exporting all structures!");
+                process.exit(0);
+            }
+        },EXPORT_DELAY);
+    }
+  }
 
 
 ///////////////    MAIN FUNCTION    ///////////////
@@ -344,7 +413,7 @@ function start(){
 
 
     ///// RENDER EACH STRUCTURE /////
-    
+
     let STRUCTURE_LIST = data.structure_set;
 
     //start with #0 then iterate through each
