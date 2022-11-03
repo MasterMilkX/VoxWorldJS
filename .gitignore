@@ -2,7 +2,10 @@
 scripts/update_ghpages.sh
 output_PNG/
 output_GIF/
-
+scripts/anim_test.html
+scripts/cube-gif.js
+scripts/headless_test.js
+scripts/multi-gif.js
 
 
 

@@ -2,7 +2,7 @@
 // KIND OF HACKY - STRINGS TOGETHER THE STEPS OF THE FUNCTIONS (BECAUSE OF THE IMPORTING TEXTURES CAUSING ASYNC ISSUES)
 // Written by: Milk
 
-// Input: JSON data => { "structure": str (3d int array of the structure), "textures" : [str list] (texture names), ("id": int, "angle": int (0-359), "zoom": int, "height":int, "offset": [float list]) }
+// Input: JSON data => { "structure": str (3d int array of the structure), "textures" : [str list] (texture names), ("id": int, "angle": int (0-359), "distance": int, "height":double, "offset": [float list]) }
 
 
 
@@ -31,9 +31,9 @@ var CENTER_Y = 2;
 
 var RENDER_DELAY = 50;   //how long to wait (ms) after attempting to render the structure onto the canvas 
 var EXPORT_DELAY = 10;   //how long to wait (ms) after exporting the image file before going to the next structure
-var GIF_FRAMES = 60;
-var FRAME_DELAY = 10;
-var CLOCKWISE = false;
+var GIF_FRAMES = 30;
+var FRAME_DELAY = 1;
+var CLOCKWISE = true;
 
 var CUR_TEXTURE_LIST = []
 var CUR_STRUCTURE = []
@@ -93,7 +93,10 @@ var encoder = new GIFEncoder(CANV_WIDTH, CANV_HEIGHT);
 function setupStruct(full_data,id){
     //get the structure data
     let data = full_data[id];
-    console.log(" ------- STRUCTURE #" + id + " ------- ");
+    if(data.id == undefined)
+        console.log(" ------- STRUCTURE #" + id + " ------- ");
+    else
+        console.log(" ------- STRUCTURE #" + id + " (" +data.id + ") ------- ");
 
     //parse the structure json
     console.log("> GETTING STRUCTURE...");
@@ -218,16 +221,17 @@ function make3dStructure(full_data,struct_id,arr3d,offset=[0,0,0]){
 
     //use parameters to set the camera position if they exist
     if(full_data[struct_id].angle != undefined){
-        ANGLE = full_data[struct_id].angle;
+        ANGLE = parseInt(full_data[struct_id].angle);
     }
-    if(full_data[struct_id].zoom != undefined){
-        RADIUS = full_data[struct_id].zoom;
+    if(full_data[struct_id].distance != undefined){
+        RADIUS = parseInt(full_data[struct_id].distance);
     }
     if(full_data[struct_id].height != undefined){
-        CENTER_Y = full_data[struct_id].height;
+        CENTER_Y = parseFloat(full_data[struct_id].height);
     }
-    rotateCam(ANGLE,CENTER_Y,RADIUS)
-    customCam();
+
+    console.log(`> Camera position set to: angle=${ANGLE}, zoom=${RADIUS}, height=${CENTER_Y}`);
+    rotateCam(ANGLE,CENTER_Y,RADIUS);
 
     //add the structure to the scene
     SCENE.add(structObj);
@@ -345,7 +349,7 @@ function gifUpdate(full_data,struct_id,filename,maxFrames) {
     idx++;
 
     //goto next frame
-    if(idx < maxFrames) {
+    if(idx < maxFrames+1) {
         setTimeout(function(){gifUpdate(full_data,struct_id,filename,maxFrames)}, FRAME_DELAY);
     }
     //finish and goto next structure
@@ -420,6 +424,7 @@ function start(){
 
     //start with #0 then iterate through each
     let struct_id = 0;
+    resetCamera();
     setupStruct(STRUCTURE_LIST,struct_id);
 }
 
