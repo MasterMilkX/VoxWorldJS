@@ -13,6 +13,11 @@ class NumpyArrayEncoder(JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return JSONEncoder.default(self, obj)
+
+# directly convert a npy array to a JSON string
+def npy2txt(arr):
+    return json.dumps(arr, cls=NumpyArrayEncoder)
+
         
 #below was entirely written by Github Copilot (thanks!)
 if __name__ == "__main__":

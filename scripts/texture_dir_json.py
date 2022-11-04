@@ -5,7 +5,7 @@ import json
 import sys
 
 #get the parameters (if there are any)
-tdir = sys.argv[1] if len(sys.argv) > 1 else './textures'
+tdir = sys.argv[1] if len(sys.argv) > 1 else '../textures'
 jfile = sys.argv[2] if len(sys.argv) > 2 else f'{tdir}/textures.json'
 
 #import the list of texture pngs

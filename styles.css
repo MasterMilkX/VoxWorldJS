@@ -239,3 +239,10 @@ button{
     display:inline-block;
     font-size:14px;
 }
+
+#sliderHide{
+    display: block;
+}
+#sliderControls{
+    display: none;
+}
