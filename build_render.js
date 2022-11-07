@@ -41,7 +41,8 @@ var RENDER_DELAY = 50;   //how long to wait (ms) after attempting to render the 
 var EXPORT_DELAY = 10;   //how long to wait (ms) after exporting the image file before going to the next structure
 var GIF_FRAMES = 30;
 var FRAME_DELAY = 1;
-var STRUCT_DELAY = 0;    
+var STRUCT_DELAY = 250;    
+var BLOCK_DELAY = 100;
 var CLOCKWISE = true;
 
 var CUR_TEXTURE_LIST = []
@@ -87,6 +88,8 @@ function parseConfig(){
         FRAME_DELAY = config["FRAME_DELAY"];
     if(config["STRUCT_DELAY"] != undefined)
         STRUCT_DELAY = config["STRUCT_DELAY"];
+    if(config["BLOCK_DELAY"] != undefined)
+        BLOCK_DELAY = config["BLOCK_DELAY"];
     if(config["CLOCKWISE"] != undefined)
         CLOCKWISE = config["CLOCKWISE"];
     if(config["OUTMODE"] != undefined)
@@ -290,16 +293,13 @@ function renderStruct(){
 
     //add the structure to the scene
     SCENE.add(structObj);
-
-    //render the scene
-    RENDERER.render(SCENE, CAMERA);
 }
 
 // adds a block to the structure
-function addBlock(block,render=true){
+function addBlock(block,remake=true){
     //change the block at the specified location
     CUR_3D_STRUCT[block.x][block.y][block.z] = block.block_id;
-    if(render)
+    if(remake)
         renderStruct();
 }
 
@@ -334,6 +334,9 @@ function rotateCam(angle,height,radius){
 
 //export the canvas as gif with rotating the structure
 var idx = 0;
+let CUR_SET_IDX = 0;
+let CUR_ACT_IDX = 0;
+var recInt = null;
 function exportGIF(full_data,filename){
     idx = 0;
     //setup gif
@@ -345,118 +348,79 @@ function exportGIF(full_data,filename){
     encoder.setDelay(FRAME_DELAY); // frame delay in ms
     encoder.setQuality(10); // image quality. 10 is default.
 
-    //rotate and save frames
-    console.log("> Making " + GIF_FRAMES + " gif frames...");
-    if(full_data.alterations.length>1){
-        console.log("> + " + STRUCT_DELAY*full_data.alterations.length + " gif frames for different structures");
-    }
-    gifUpdate(full_data.alterations,0,0,filename,GIF_FRAMES,full_data.rotate);
+    //override with preset options in the data
+    let ROT_FRAMES = (full_data.cycle_frames ? full_data.cycle_frames : GIF_FRAMES);
+    FRAME_DELAY = (full_data.frame_delay ? full_data.frame_delay : FRAME_DELAY);
+    STRUCT_DELAY = (full_data.struct_delay ? full_data.struct_delay : STRUCT_DELAY);
+
+    CUR_SET_IDX = 0;
+    CUR_ACT_IDX = 0;
+
+    //make an interval for adding the blocks and recording the gif
+    console.log("> Recording gif...");
+    setTimeout(function(){placeBlock(full_data)})
+    recInt = setInterval(function(){gifUpdate(ROT_FRAMES,full_data.rotate)},FRAME_DELAY);
+
 }
 
-//rotates the structure and saves a frame
-function gifUpdate(block_data,set_index,act_index,filename,maxFrames,rotate=true) {
+//places blocks in the structure one by one
+function placeBlock(full_data,filename){
+    //end of the line
+    if(CUR_SET_IDX == full_data.alterations.length){
+        //stop the recording after the last structure
+        setTimeout(function(){clearInterval(recInt);gifStop(filename);},STRUCT_DELAY);
+        return;
+    }
+
+    //otherwise keep adding
+    addBlock(full_data.alterations[CUR_SET_IDX][CUR_ACT_IDX]);
+    CUR_ACT_IDX++;
+
+    //wait between structures
+    if(CUR_ACT_IDX >= full_data.alterations[CUR_SET_IDX].length){
+        console.log("    > Finished structure "+(CUR_SET_IDX+1)+"/"+full_data.alterations.length);
+        CUR_ACT_IDX = 0;
+        CUR_SET_IDX++;
+        setTimeout(function(){placeBlock(full_data,filename);},STRUCT_DELAY);
+    }
+    //place blocks as normal
+    else{
+        setTimeout(function(){placeBlock(full_data,filename);},BLOCK_DELAY);
+    }
+}
+
+//update the frames of the gif
+function gifUpdate(rotFrames,rotate=true){
     if (rotate){
         //rotate the camera
         if(!CLOCKWISE)
-            ANGLE += Math.floor(360/maxFrames);
+            ANGLE += Math.floor(360/rotFrames);
         else
-            ANGLE -= Math.floor(360/maxFrames);
+            ANGLE -= Math.floor(360/rotFrames);
         ANGLE %= 360;  
         // console.log(`Angle: ${ANGLE}`);
         rotateCam(ANGLE,CENTER_Y,RADIUS);
     }
-     
-    //add the next block (and render)
-    // console.log(block_data[set_index][act_index]);
-    addBlock(block_data[set_index][act_index]);
-    act_index+=1;
+    //render the scene
+    RENDERER.render(SCENE, CAMERA);
 
-    //iterate the frame counter
-    if(idx > 0) {
-        encoder.addFrame(rendCanvas.__ctx__);
-      // console.log(`add frame ${idx}`);
-    }
-    idx++;
-
-    //goto next frame or next section
-    // if(idx < maxFrames+1) {
-        //end of actions for current structure
-        if(act_index == block_data[set_index].length){
-            //duplicate frames for a while
-            setTimeout(function(){
-                //duplicate on freeze-frame
-                console.log("freeze frame");
-                duplicateFrame(block_data,set_index,act_index,filename,maxFrames,rotate,(set_index==block_data.length-1));
-            },FRAME_DELAY)
-        }
-        //goto next action
-        else{
-            setTimeout(function(){gifUpdate(block_data,set_index,act_index,filename,maxFrames,rotate)}, FRAME_DELAY);
-        }
-    // }
-    // //finish the gif
-    // else{
-    //     duplicateFrame(block_data,set_index,act_index,filename,maxFrames,rotate,true);
-        //save the encoded frames and make a new encoder (doesn't make new gifs otherwise)
-        // encoder.finish();
-        // encoder = null;
-        // console.log("> Exported GIF to " + filename);
-
-        // //FINISHED! do the next structure or exit
-        // setTimeout(function(){
-        //     console.log("-------------------------------------------")
-        //     console.log("> Finished exporting all structures!");
-        //     process.exit(0);
-            
-        // },EXPORT_DELAY);
-    // }
+    //record the frame
+    encoder.addFrame(rendCanvas.__ctx__);
 }
 
-//duplicates a single frame 
-let min_idx = 0;
-function duplicateFrame(block_data,set_index,act_index,filename,maxFrames,rotate,last=false){
-    //keep this structure
-    if(min_idx <  Math.floor(STRUCT_DELAY/FRAME_DELAY)){
-        min_idx++;
-        if(rotate){
-            //rotate the camera
-            if(!CLOCKWISE)
-                ANGLE += Math.floor(360/maxFrames);
-            else
-                ANGLE -= Math.floor(360/maxFrames);
-            ANGLE %= 360;  
-            // console.log(`Angle: ${ANGLE}`);
-            rotateCam(ANGLE,CENTER_Y,RADIUS);
-            RENDERER.render(SCENE, CAMERA);
-        }
-        //add the block to the structure
-        encoder.addFrame(rendCanvas.__ctx__);  
-        setTimeout(function(){duplicateFrame(block_data,set_index,act_index,filename,maxFrames,rotate,last)},FRAME_DELAY);
-    }
-    //start next set
-    else{
-        //go to next action structure set
-        if(!last){
-            min_idx = 0;
-            set_index += 1;
-            act_index = 0;
-            setTimeout(function(){gifUpdate(block_data,set_index,act_index,filename,maxFrames,rotate)},FRAME_DELAY);
-        }
-        //finish the gif entirely
-        else{
-            encoder.finish();
-            encoder = null;
-            console.log("> Exported GIF to " + filename);
+function gifStop(filename){
+    // save the encoded frames and make a new encoder (doesn't make new gifs otherwise)
+    encoder.finish();
+    encoder = null;
+    console.log("> Exported GIF to " + filename);
 
-            //FINISHED! do the next structure or exit
-            setTimeout(function(){
-                console.log("-------------------------------------------")
-                console.log("> Finished exporting all structures!");
-                process.exit(0);
-                
-            },EXPORT_DELAY);
-        }
-    }
+    //FINISHED! do the next structure or exit
+    setTimeout(function(){
+        console.log("-------------------------------------------")
+        console.log("> Finished exporting all structures!");
+        process.exit(0);
+        
+    },EXPORT_DELAY);
 }
 
 

@@ -87,7 +87,7 @@ def makeFullJSON(struct,struct_nexts=None,options=None):
         print("> Building structure from nothing")
         full_json["init_structure"] = json.dumps(np.zeros(struct.shape),cls=npenc)  #convert back to txt string
         actions = buildStructure(struct)
-        full_json["alterations"] = actions
+        full_json["alterations"] = [actions]
     # if multiple structures passed, build from one to the next
     else:
         print(f"> Building structure from another ( [{len(struct_nexts)+1}] structures total )")
@@ -120,11 +120,12 @@ if __name__ == "__main__":
     parser.add_argument("--texture_set", metavar='t', type=str, help="the filepath of the .txt list of textures to use")
     parser.add_argument('--id', metavar='i', type=str, help='the id name of the structure')
     parser.add_argument("--rotate", action='store_true', help="whether the structure should rotate during animation")
+    parser.add_argument("--cycle_frames", metavar='c', type=int, help="the number of frames in the gif for the structure to complete a full rotation")
     parser.add_argument("--angle", metavar='a', type=int, help="the starting angle of the structure")
     parser.add_argument("--y_height", metavar='y', type=int, help="the y-value to view the structure")
     parser.add_argument("--distance", metavar='d', type=int, help="the radial distance to view the structure")
-    parser.add_argument("--delay", metavar='D', type=int, help="the delay between each block addition")
-    parser.add_argument("--extra_delay", metavar='e', type=int, help="the delay between each structure addition")
+    parser.add_argument("--block_delay", metavar='b', type=int, help="the delay between each block addition")
+    parser.add_argument("--struct_delay", metavar='s', type=int, help="the delay between each structure addition")
 
     args = parser.parse_args()
 
@@ -154,10 +155,12 @@ if __name__ == "__main__":
         options["height"] = args.y_height
     if args.distance is not None:
         options["distance"] = args.distance
-    if args.delay is not None:
-        options["delay"] = args.delay
-    if args.extra_delay is not None:
-        options["extra_delay"] = args.extra_delay
+    if args.cycle_frames is not None:
+        options["cycle_frames"] = args.cycle_frames
+    if args.block_delay is not None:
+        options["block_delay"] = args.block_delay
+    if args.struct_delay is not None:
+        options["struct_delay"] = args.struct_delay
 
     # add the texture set if given
     if args.texture_set is not None:
