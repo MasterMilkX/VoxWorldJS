@@ -3,12 +3,24 @@ Quick voxel renderer application for viewing textured 3d integer arrays
 
 **Quick Online Interactive Webapp**:  [https://mastermilkx.github.io/VoxWorldJS/](https://mastermilkx.github.io/VoxWorldJS/)
 
+## Table of Contents
+
+1. [System Demos](#1-system-demos)
+2. [Browser Usage](#2-browser-usage)
+3. [Mass Output Usage](#3-mass-output-usage)
+4. [Builder Output Usage](#4-builder-output-usage)
+5. [Helper Scripts](#5-helper-scripts)
+6. [Notes](#6-notes)
+
 --- 
 
-## Systems
-- Browser system - for quick interactive viewing of a 3d integer array
+## 1. System Demos
+- **Browser system** - for quick interactive viewing of a 3d integer array
 ![Browser Demo](md_assets/voxworld_demo_full.gif)
-- Console system - for mass rendering and image exporting of multiple 3d integer arrays.
+- **Mass Render Console system** - for mass rendering and image exporting of multiple 3d integer arrays structures.
+![Mass Render Demo](md_assets/mass_render_demo.gif)
+- **Builder Console system** - for creating gifs of structures being built block by block.
+![Builder Render Demo](md_assets/build_render_demo.gif)
 
 
 ---
@@ -27,10 +39,14 @@ Quick voxel renderer application for viewing textured 3d integer arrays
 1. Download and install the package manager [NodeJS](https://nodejs.org/en/download/)
 2. Clone this repository to your local machine and navigate to it using a terminal
 3. _(For console usage only)_ Run the command `npm install` to install the necessary packages found in the [package.json](./package.json) file
+
+* _Note_: If node-canvas errors out do this 
+    1. goto `node-modules/canvas/`
+    2. run `npm install --build-from-source`
 ---
 
 
-## Browser Usage
+## 2. Browser Usage
 
 ### Running
 1. Start a local server in the directory using the command `python -m http.server`
@@ -67,14 +83,34 @@ Quick voxel renderer application for viewing textured 3d integer arrays
 * **To change the texture set used:** (Note: can only be done on a local version of the app) Replace the texture images in the [textures/](textures/) folder and run the script [texture_dir_json.py](scripts/texture_dir_json.py) (see the 'Helper Scripts' section for more details). It's recommended to keep the "air.png" texture in this set to have blocks that are not rendered as cube objects.
 
 --- 
-## Console Usage
+## 3. Mass Output Usage
+
+### Input
+1. JSON Files must be structured like this:
+```
+{
+    "structure_set":[
+        {
+            "structure": <STR of INT 3D ARR>,
+
+            "id":<STR>,
+            "angle":<INT>,
+            "distance":<INT>,
+            "height":<DOUBLE>,
+            "texture_set": <STR LIST>
+        },
+        {...}
+    ]
+}
+```
+The `structure` is the only mandatory value as a stringified 3d integer array (see the [npy2txt.py](scripts/npy2txt.py)) - all others are optional. However, if no `texture_set` is specified in the first listed structure, the default set will be used, as specified in the [config](config.yaml).
 
 ### Running
-1. Run the command `node render.js [INPUT JSON FILE] ([PNG|GIF] [OUTPUT_DIR])` 
+1. Run the command `node mass_render.js [INPUT JSON FILE] ([PNG|GIF] [OUTPUT_DIR])` 
    - `[INPUT JSON FILE]` - the name of the file with the list fo structures and other parameters you want to process 
    - `[PNG]` or `[GIF]` - (optional) specifies which kind of output you'd lke
    - `[OUTPUT_DIR]` - (optional) the output directory you'd like to store the exported media to (creates the directory if it doesn't exist)
-   - _Example_: `node render.js samples/offline_json_sets.json GIF my_dir/`  renders the structures to GIFs and store in a folder named my_dir`
+   - _Example_: `node mass_render.js samples/offline_json_sets/render_png-gif_maps.json GIF my_dir/`  renders the structures to GIFs and store in a folder named my_dir`
 
 * Note: _See the [offline_json_sets](samples/offline_json_sets) folder for sample files you can import_
 
@@ -88,10 +124,31 @@ GIF
 ![Sample GIF outputs of structures](md_assets/output_gif_struct.gif)
 
 ---
-## Helper Scripts
-There are 2 scripts that can assist with converting your code for use with the system
+## 4. Builder Output Usage
 
-#### [npy2txt.py](scripts/npy2txt.py)
+### Input
+1. Requires a special type of JSON made by the [builder_anim.py](scripts/builder_anim.py) script. See its subsection below in the 'Helper Scripts' section below.
+
+### Running
+1. Run the command `node builder.js [INPUT JSON FILE]` 
+   - `[INPUT JSON FILE]` - the name of the file with the initial structures, list of block change actions and other parameters you want to process 
+   - _Example_: `node mass_render.js samples/offline_json_sets/build_pyramid1.json GIF my_dir/`  renders and animates the structure and store in a folder named my_dir`
+
+* Note: _See the [offline_json_sets](samples/offline_json_sets) folder for sample files you can import_
+
+### Modifying
+The parameters are stored in the JSON file itself (see the 'Options' description of the [builder_anim.py](scripts/builder_anim.py) documentation below.)
+
+### Sample Outputs
+(LEFT) 1 pyramid build from nothing (RIGHT) 3 pyramids built by modifying the blocks
+![Sample GIF outputs of single structure](md_assets/double_pyramid2.gif)
+
+
+---
+## 5. Helper Scripts
+There are 3 scripts that can assist with converting your code for use with the system
+
+### [npy2txt.py](scripts/npy2txt.py)
 Converts a numpy .npy array to a JSON readable text string.
 
 ##### _Console Usage_: 
@@ -111,14 +168,22 @@ Converts a numpy .npy array to a JSON readable text string.
 _Note_: If your structures come out rotated weird, try using [np.rot90()](https://numpy.org/doc/stable/reference/generated/numpy.rot90.html) and rendering it until it looks correct.
 
 
-#### [texture_dir_json.py](scripts/texture_dir_json.py)
+### [texture_dir_json.py](scripts/texture_dir_json.py)
 Generates a JSON of the texture names in a directory to be read and used by the app for importing the texture images.
 *  `python texture_dir_json.py ([PATH TO TEXTURE DIRECTORY]) ([PATH TO OUTPUT JSON FILE])`
     - `[PATH TO TEXTURE DIRECTORY]` - (optional - default='textures/') the path to the folder containing the list of texture images you'd like to use
     - `[PATH TO OUTPUT JSON FILE]` - (optional) the pathname for the output JSON file to export as
 
+### [builder_anim.py](scripts/builder_anim.py)
+Generates a JSON for an integer 3d array structure txt file that builds the structure from scratch by adding blocks iteratively OR takes in a set of 3d array txt files to transform from one structure to another by switching out blocks.
+* `python builder_anim.py [PATH TO TXT STRUCTURE FILE] ([PATHS TO OTHER TXT STRUCTURE FILES]) ([OPTIONS])`
+    - `[PATH TO TXT STRUCTURE FILE]` - the path to the txt file of the 3d integer array representing the structure to render. Having only one structure will make the script build the structure from nothing.
+    - `([PATHS TO OTHER TXT STRUCTURE FILES])` - (optional) the path(s) to other 3d integer array structures to transform into one after the other (NOTE: must be the same dimensions as the first passed structure)
+    - `(options)` - (optional) additional parameters to pass to the JSON file to be read in when the animation is parsed by the [builder.js](builder.js) script. They are as follows:
+  - ![Optional builder_anim.py arguments](md_assets/optional_args.png)
+
 ---
-## Notes
+## 6. Notes
 - License: MIT
 - If you have any questions, feel free to contact me via email at mlc761@nyu.edu or DM me @MasterMilkX on Twitter.
 - If you use this in a project (for school, research, or fun), please let me reach out! I'd love to see how you use it 😉!

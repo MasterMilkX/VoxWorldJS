@@ -10,5 +10,5 @@ TODO
     1. goto node-modules/canvas/
     2. run `npm install --build-from-source`
     - try also `brew install pkg-config cairo pango libpng jpeg giflib librsvg`
-[ ] Make a combined structure building rotational GIF (iteratively add blocks)
-[ ] Make the README / documentation
+[X] Make a combined structure building rotational GIF (iteratively add blocks)
+[X] Make the README / documentation

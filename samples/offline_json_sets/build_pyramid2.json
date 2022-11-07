@@ -1,6 +1,6 @@
 {
   "id": "pyramid",
-  "rotate": false,
+  "rotate": true,
   "angle": 244,
   "height": 4,
   "distance": 8,

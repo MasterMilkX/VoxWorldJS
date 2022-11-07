@@ -358,7 +358,7 @@ function exportGIF(full_data,filename){
 
     //make an interval for adding the blocks and recording the gif
     console.log("> Recording gif...");
-    setTimeout(function(){placeBlock(full_data)})
+    setTimeout(function(){placeBlock(full_data,filename)})
     recInt = setInterval(function(){gifUpdate(ROT_FRAMES,full_data.rotate)},FRAME_DELAY);
 
 }

@@ -6,7 +6,9 @@ scripts/anim_test.html
 scripts/cube-gif.js
 scripts/headless_test.js
 scripts/multi-gif.js
-
+gif_view/
+gif_view.html
+gif_view2.html
 
 
 
