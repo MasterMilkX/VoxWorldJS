@@ -10,6 +10,7 @@ var TEXTURE_DIR = "textures/";
 var DEFAULT_TEXTURE_LIST = ["air","stonebrick","dirt","planks_oak","sand","iron_bars","glass","iron_block","log_oak","wool_colored_red","stone_slab_side"];
 var ALL_TEXTURES = [];
 var CUR_TEXTURE_LIST = [];  
+var CUR_TEXTURE_NUM = 11;
 var TEXTURE_PNG = [];  //texture images
 var TEXTURE_MAT = [];  //texture materials
 var TEXTURE_MAT2 = [];
@@ -124,6 +125,8 @@ function makeTextures(numTexture=10,scroll=false){
     if(scroll){
         textureSet.scrollTop = textureSet.scrollHeight;
     }
+
+    CUR_TEXTURE_NUM = numTexture;
 }
 
 //makes a texture row to select from
@@ -226,7 +229,7 @@ function readTextureFile(){
 function exportTextureSet(){
     //make the text file
     let text = "";
-    for (let i = 0; i < CUR_TEXTURE_LIST.length; i++){
+    for (let i = 0; i < Math.min(CUR_TEXTURE_NUM,CUR_TEXTURE_LIST.length); i++){
         text += CUR_TEXTURE_LIST[i] + "\n";
     }
     let filename = "texture_set.txt";
@@ -533,6 +536,7 @@ function init(){
     //set default selected texture
     CUR_TEXTURE_LIST = (localStorage.tex_list ? JSON.parse(localStorage.tex_list) : DEFAULT_TEXTURE_LIST);
     document.getElementById("numTextures").value = CUR_TEXTURE_LIST.length;
+    CUR_TEXTURE_NUM = CUR_TEXTURE_LIST.length
 
     //import the textures
     importTextures();

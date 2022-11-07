@@ -8,7 +8,7 @@ CANV_WIDTH : 400              # width of the render canvas
 CANV_HEIGHT : 300             # height of the render canvas
 
 # Texture settings
-TEXTURE_DIR : "./textures"    # directory to import the textures from (as specified in the input JSON file by name)
+TEXTURE_DIR : "./textures/"    # directory to import the textures from (as specified in the input JSON file by name)
 DEFAULT_TEXTURES : ["air","stonebrick","dirt","planks_oak","sand","iron_bars","glass","iron_block","log_oak","wool_colored_red","stone_slab_side"]    # default texture names to use in case no textures are given for the first structure
 
 # Default camera settings
@@ -21,6 +21,7 @@ RENDER_DELAY : 50             # how long to wait (ms) after attempting to render
 EXPORT_DELAY : 10             # how long to wait (ms) after exporting the image file before going to the next structure
 GIF_FRAMES : 30               # (#) of frames to use for the GIF to complete one revolution (more frames = slower rotation)
 FRAME_DELAY : 1               # how fast to capture the frames (does not affect rotation speed of the GIF)
+STRUCT_DELAY : 10             # # of extra frames to use between strcuture buildings
 CLOCKWISE_ROT : true          # whether to spin the structure clockwise
 
 # Output settings

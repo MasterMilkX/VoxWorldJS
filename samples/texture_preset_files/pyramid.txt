@@ -1,0 +1,5 @@
+air
+glass_light_blue
+diamond_block
+glass_red
+gold_block
