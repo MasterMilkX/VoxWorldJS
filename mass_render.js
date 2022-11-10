@@ -281,7 +281,7 @@ function make3dStructure(full_data,struct_id,arr3d,offset=[0,0,0]){
 
 
     //wait some time, then export it
-    let filename = (full_data[struct_id].id ? `${full_data[struct_id].id}` : `structure_${struct_id}`);
+    let filename = (full_data[struct_id].id !== undefined ? `${full_data[struct_id].id}` : `structure_${struct_id}`);
     setTimeout(function(){
         if(OUTMODE == "PNG"){
             exportPNG(full_data,struct_id,`${OUTPUT_DIR}/${filename}.png`);
