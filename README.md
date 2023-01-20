@@ -186,5 +186,5 @@ Generates a JSON for an integer 3d array structure txt file that builds the stru
 ## 6. Notes
 - License: MIT
 - If you have any questions, feel free to contact me via email at mlc761@nyu.edu or DM me @MasterMilkX on Twitter.
-- If you use this in a project (for school, research, or fun), please let me reach out! I'd love to see how you use it 😉!
+- If you use this in a project (for school, research, or fun), please reach out! I'd love to see how you use it 😉!
 - This project was made for research purposes only - particularly for myself and my lab mates at the Game Innovation Lab at NYU. I do not own the texture images - those are really from Minecraft (version 1.12)
