@@ -7,6 +7,7 @@ import numpy as np
 from json import JSONEncoder
 import json
 import sys
+import os
 
 class NumpyArrayEncoder(JSONEncoder):
     def default(self, obj):
@@ -24,7 +25,17 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("usage: python3 npy2txt.py <npy file input> (<txt file output>)")
         exit(1)
-    npy_file = sys.argv[1]
-    txt_file = npy_file.split('.')[0] + '.txt' if len(sys.argv) < 3 else sys.argv[2]
-    npy = np.load(npy_file)
-    json.dump(npy, open(txt_file, 'w+'), cls=NumpyArrayEncoder)
+    # if dealing with single file
+    if sys.argv[1].endswith('.npy'):
+        npy_file = sys.argv[1]
+        txt_file = npy_file.split('.')[0] + '.txt' if len(sys.argv) < 3 else sys.argv[2]
+        npy = np.load(npy_file)
+        json.dump(npy, open(txt_file, 'w+'), cls=NumpyArrayEncoder)
+    # if dealing with directory
+    else:
+        npy_dir = sys.argv[1]
+        for npy_file in os.listdir(npy_dir):
+            if npy_file.endswith(".npy"):
+                txt_file = npy_file.split('.')[0] + '.txt' if len(sys.argv) < 3 else sys.argv[2]
+                npy = np.load(os.path.join(npy_dir, npy_file))
+                json.dump(npy, open(txt_file, 'w+'), cls=NumpyArrayEncoder)
